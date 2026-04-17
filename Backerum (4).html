@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backerum</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1A4D2E;--gm:#2D7A4F;--gp:#EAF3DE;
+  --s:#E8E8DC;--sm:#9E9E8E;
+  --c:#FAFAF5;--ink:#1C1C1A;--ink2:#4A4A44;--ink3:#8A8A80;
+  --am:#D48B2E;--ap:#FDF3E0;
+  --r:10px;--rs:6px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--c);color:var(--ink);min-height:100vh}
+/* HEADER */
+header{background:var(--g);color:#fff;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-family:'Playfair Display',serif;font-size:1.3rem}
+.logo em{font-style:normal;opacity:.5;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:300;margin-left:8px}
+.hbtns{display:flex;gap:8px}
+.hbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:20px;padding:5px 14px;font-size:.82rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+.hbtn:hover{background:rgba(255,255,255,.25)}
+/* NAV */
+nav{background:#fff;border-bottom:1px solid var(--s);padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+nav::-webkit-scrollbar{display:none}
+.ntab{padding:11px 13px;font-size:.85rem;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.ntab:hover{color:var(--ink)}
+.ntab.on{color:var(--g);border-bottom-color:var(--g);font-weight:500}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+/* MAIN */
+main{padding:20px;max-width:1080px;margin:0 auto}
+.sec{display:none}.sec.on{display:block}
+/* PAGE TITLE */
+.ptitle{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:4px}
+.psub{color:var(--ink3);font-size:.87rem;margin-bottom:20px}
+/* BUTTONS */
+.btn{padding:7px 16px;border-radius:20px;border:1px solid var(--s);background:#fff;color:var(--ink);font-size:.84rem;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--c)}
+.btn.pri{background:var(--g);color:#fff;border-color:var(--g)}
+.btn.pri:hover{background:var(--gm)}
+.btn.ylw{background:var(--ap);color:#5C3D2E;border-color:#e8c98a}
+.btn.ylw:hover{background:#faecc8}
+.btn.red{color:#C0392B;border-color:#e8c0bb}
+.btn.red:hover{background:#fdecea}
+/* CARD */
+.card{background:#fff;border:1px solid var(--s);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.ch{padding:12px 16px;border-bottom:1px solid var(--s);display:flex;align-items:center;justify-content:space-between}
+.ct{font-weight:500;font-size:.95rem}
+.cb{padding:14px 16px}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:#fff;border:1px solid var(--s);border-radius:var(--r);padding:14px 16px;cursor:pointer}
+.kpi:hover{border-color:#aaa}
+.kl{font-size:.73rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.kv{font-size:1.5rem;font-weight:500}
+.ks{font-size:.75rem;color:var(--ink3);margin-top:3px}
+/* TILES */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:20px}
+.tile{background:#fff;border:1px solid var(--s);border-radius:var(--r);padding:14px;cursor:pointer}
+.tile:hover{border-color:#aaa;transform:translateY(-1px)}
+.tile-t{font-weight:500;font-size:.95rem;margin-bottom:10px}
+.tsub{font-size:.78rem;color:var(--ink3);padding:5px 8px;background:var(--c);border-radius:4px;margin-bottom:3px;cursor:pointer}
+.tsub:hover{background:var(--gp);color:var(--g)}
+/* ACTIONS ROW */
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{text-align:left;padding:9px 12px;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);background:var(--c);border-bottom:1px solid var(--s);font-weight:500}
+td{padding:10px 12px;border-bottom:1px solid var(--s);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9f9f6}
+.empty-td{text-align:center;color:var(--ink3);font-style:italic;padding:28px}
+/* BADGE */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.73rem;font-weight:500}
+.bg{background:var(--gp);color:#1A4D2E}
+.ba{background:var(--ap);color:#5C3D2E}
+.br{background:#FDECEA;color:#C0392B}
+.bb{background:#E8F0F9;color:#2E6DA4}
+.bs{background:var(--s);color:var(--ink2)}
+/* DRIVE LINKS */
+.dlinks{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.dlink{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border:1px solid var(--s);border-radius:var(--rs);text-decoration:none;color:var(--ink);font-size:.87rem}
+.dlink:hover{border-color:#aaa;background:var(--gp)}
+.dlink-n{flex:1;font-weight:500}
+/* DRIVE NOTE */
+.dnote{background:var(--ap);border:1px solid #e8c98a;border-radius:var(--rs);padding:12px 16px;font-size:.83rem;color:#5C3D2E;margin-bottom:16px;line-height:1.55}
+/* CHECKLIST */
+.cl{display:flex;flex-direction:column;gap:3px}
+.ci{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;border-radius:var(--rs);cursor:pointer}
+.ci:hover{background:var(--c)}
+.ci.done{opacity:.5}
+.ci.done .ct2{text-decoration:line-through}
+.cbox{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--sm);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.ci.done .cbox{background:var(--g);border-color:var(--g)}
+.ct2{flex:1;font-size:.87rem}
+.cprio{font-size:.71rem;padding:1px 7px;border-radius:10px;flex-shrink:0;margin-top:2px}
+/* PROJECT CARD */
+.pc{background:#fff;border:1px solid var(--s);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.pc-top{display:flex;align-items:stretch;border-bottom:1px solid var(--s)}
+.pc-bar{width:5px;flex-shrink:0}
+.pc-info{flex:1;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pc-name{font-weight:500;font-size:.97rem}
+.pc-meta{font-size:.76rem;color:var(--ink3);margin-top:2px}
+.pc-pct{text-align:right;font-size:1.3rem;font-weight:500}
+.pc-prog{height:4px;background:var(--s)}
+.pc-fill{height:100%;background:#4CAF7D;transition:width .3s}
+.pc-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.pc-left{padding:14px 16px;border-right:1px solid var(--s)}
+.pc-right{padding:14px 16px;background:#fafaf8}
+.pc-desc{font-size:.86rem;color:var(--ink2);line-height:1.55;margin-bottom:12px}
+.pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.pc-stat{border-radius:8px;padding:9px 10px;text-align:center}
+.pc-stat-v{font-size:1.2rem;font-weight:500}
+.pc-stat-l{font-size:.7rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.pc-btns{display:flex;flex-direction:column;gap:5px}
+.cl-head{font-size:.71rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.ci2{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;margin-bottom:3px;cursor:pointer;font-size:.83rem;border:1px solid var(--s);background:#fff}
+.ci2:hover{background:var(--c)}
+.ci2.done{opacity:.5}
+.ci2.done span{text-decoration:line-through}
+.cb2{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--sm);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.cb2.sq{border-radius:3px}
+.ci2.done .cb2{background:var(--g);border-color:var(--g)}
+.ci2.done .cb2.sq{background:var(--am);border-color:var(--am)}
+/* MISSION */
+.mc{background:#fff;border:1px solid var(--s);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.mc-head{background:var(--g);padding:12px 16px;color:#fff}
+.mc-title{font-family:'Playfair Display',serif;font-size:1.05rem}
+.mc-date{font-size:.78rem;opacity:.72;margin-top:2px}
+.mc-body{padding:14px 16px}
+.mp{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--c);border-radius:6px;margin-bottom:6px;font-size:.87rem}
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.ov.on{display:flex}
+.modal{background:#fff;border-radius:var(--r);width:100%;max-width:520px;overflow:hidden}
+.mh{padding:14px 18px;border-bottom:1px solid var(--s);display:flex;align-items:center;justify-content:space-between}
+.mh-t{font-weight:500;font-size:.97rem}
+.mx{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--ink3);padding:0 4px;line-height:1}
+.mb{padding:18px}
+.mf{padding:12px 18px;border-top:1px solid var(--s);display:flex;gap:8px;justify-content:flex-end}
+/* FORM */
+.fr{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fl{font-size:.79rem;font-weight:500;color:var(--ink2)}
+.fi,.fs,.ft{padding:8px 11px;border:1px solid var(--s);border-radius:var(--rs);font-family:inherit;font-size:.87rem;color:var(--ink);background:#fff;outline:none;width:100%}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--g)}
+.ft{min-height:75px;resize:vertical}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* PHOTO GRID */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.pthumb{aspect-ratio:4/3;border-radius:var(--rs);background:var(--s);border:1px solid var(--s);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;font-size:.75rem;color:var(--ink3);cursor:pointer}
+.pthumb:hover{border-color:#aaa}
+/* EMPTY */
+.empty-state{text-align:center;padding:36px 20px;color:var(--ink3)}
+.empty-state p{font-size:.88rem;margin-bottom:14px}
+/* PRINT */
+@media print{header,nav,.acts,.btn,.hbtns,.ov{display:none!important}body{background:#fff}}
+/* INFO BOX */
+.info{background:var(--gp);border:1px solid #b8ddc2;border-radius:var(--rs);padding:12px 16px;font-size:.84rem;color:#1A4D2E;margin-bottom:14px;line-height:1.55}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Backerum <em>Sommarstugan</em></div>
+  <div class="hbtns">
+    <button class="hbtn" id="btn-new-proj">+ Nytt projekt</button>
+    <button class="hbtn" id="btn-new-mission">+ Nytt uppdrag</button>
+    <button class="hbtn" id="btn-print">Skriv ut</button>
+  </div>
+</header>
+
+<nav>
+  <div class="ntab on" data-sec="hem"><span class="dot" style="background:#1A4D2E"></span>Översikt</div>
+  <div class="ntab" data-sec="ekonomi"><span class="dot" style="background:#3B6D11"></span>Ekonomi</div>
+  <div class="ntab" data-sec="uthyrning"><span class="dot" style="background:#0F6E56"></span>Uthyrning</div>
+  <div class="ntab" data-sec="projekt"><span class="dot" style="background:#185FA5"></span>Projekt</div>
+  <div class="ntab" data-sec="uppdrag"><span class="dot" style="background:#534AB7"></span>Uppdrag</div>
+  <div class="ntab" data-sec="bilder"><span class="dot" style="background:#854F0B"></span>Bilder</div>
+  <div class="ntab" data-sec="listor"><span class="dot" style="background:#6B4FA0"></span>Listor</div>
+  <div class="ntab" data-sec="bildboken"><span class="dot" style="background:#993C1D"></span>Bildboken</div>
+  <div class="ntab" data-sec="dokument"><span class="dot" style="background:#5F5E5A"></span>Dokument</div>
+</nav>
+
+<main>
+
+<!-- ÖVERSIKT -->
+<div class="sec on" id="sec-hem">
+  <div class="ptitle">God dag, Backerum väntar</div>
+  <div class="psub" id="today"></div>
+  <div class="kpis" id="kpi-row"></div>
+  <div class="tiles">
+    <div class="tile" data-goto="ekonomi">
+      <div style="width:8px;height:8px;border-radius:50%;background:#3B6D11;margin-bottom:8px"></div>
+      <div class="tile-t">Ekonomi</div>
+      <div class="tsub" data-drive="ekonomi">Öppna i Google Drive →</div>
+      <div class="tsub" data-claude="budget">Uppdatera budget med Claude →</div>
+      <div class="tsub" data-modal="expense">Logga ny kostnad</div>
+    </div>
+    <div class="tile" data-goto="uthyrning">
+      <div style="width:8px;height:8px;border-radius:50%;background:#0F6E56;margin-bottom:8px"></div>
+      <div class="tile-t">Uthyrning</div>
+      <div class="tsub" data-drive="uthyrning">Öppna i Google Drive →</div>
+      <div class="tsub" data-claude="gastmail">Skriv gästmail med Claude →</div>
+      <div class="tsub" data-modal="guest">Lägg till bokning</div>
+    </div>
+    <div class="tile" data-goto="projekt">
+      <div style="width:8px;height:8px;border-radius:50%;background:#185FA5;margin-bottom:8px"></div>
+      <div class="tile-t">Projekt</div>
+      <div class="tsub" data-drive="projekt">Öppna i Google Drive →</div>
+      <div class="tsub" data-modal="proj">Skapa nytt projekt</div>
+      <div class="tsub" data-modal="import">Importera från Claude</div>
+    </div>
+    <div class="tile" data-goto="uppdrag">
+      <div style="width:8px;height:8px;border-radius:50%;background:#534AB7;margin-bottom:8px"></div>
+      <div class="tile-t">Uppdrag</div>
+      <div class="tsub" data-modal="mission">Skapa nytt uppdrag</div>
+      <div class="tsub" data-goto="uppdrag">Visa alla uppdrag</div>
+    </div>
+    <div class="tile" data-goto="bilder">
+      <div style="width:8px;height:8px;border-radius:50%;background:#854F0B;margin-bottom:8px"></div>
+      <div class="tile-t">Bilder</div>
+      <div class="tsub" data-drive="bilder">Öppna i Google Drive →</div>
+      <div class="tsub" data-claude="bilder">Analysera med Claude →</div>
+    </div>
+    <div class="tile" data-goto="listor">
+      <div style="width:8px;height:8px;border-radius:50%;background:#6B4FA0;margin-bottom:8px"></div>
+      <div class="tile-t">Listor</div>
+      <div class="tsub" data-modal="todo">Ny att-göra</div>
+      <div class="tsub" data-modal="purchase">Nytt inköp</div>
+    </div>
+    <div class="tile" data-goto="bildboken">
+      <div style="width:8px;height:8px;border-radius:50%;background:#993C1D;margin-bottom:8px"></div>
+      <div class="tile-t">Bildboken</div>
+      <div class="tsub" data-claude="bildboken">Planera boken med Claude →</div>
+    </div>
+    <div class="tile" data-goto="dokument">
+      <div style="width:8px;height:8px;border-radius:50%;background:#5F5E5A;margin-bottom:8px"></div>
+      <div class="tile-t">Dokument</div>
+      <div class="tsub" data-drive="dokument">Öppna i Google Drive →</div>
+    </div>
+  </div>
+  <div class="dnote">
+    <strong>Koppla till Google Drive:</strong> Klicka på knappen nedan, klistra in länkarna till dina Drive-mappar. Sedan öppnar varje kort rätt mapp direkt.
+    <br><br>
+    <button class="btn ylw" id="btn-drive-config">Konfigurera Drive-länkar</button>
+  </div>
+</div>
+
+<!-- EKONOMI -->
+<div class="sec" id="sec-ekonomi">
+  <div class="ptitle">Ekonomi</div>
+  <div class="psub">Budget, kostnader och kvitton</div>
+  <div class="dlinks">
+    <div class="dlink" data-drive="ekonomi"><span>📁</span><span class="dlink-n">Ekonomi-mappen</span><span>→</span></div>
+    <div class="dlink" data-drive="budget"><span>📊</span><span class="dlink-n">Budget_Backerum.xlsx</span><span>→</span></div>
+  </div>
+  <div class="acts">
+    <button class="btn pri" data-modal="expense">+ Ny kostnad</button>
+    <button class="btn" data-claude="budget">Uppdatera budget med Claude →</button>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Senaste kostnader</div><button class="btn" style="font-size:.78rem;padding:5px 11px" data-modal="expense">+ Lägg till</button></div>
+    <div style="padding:0"><table><thead><tr><th>Datum</th><th>Kategori</th><th>Beskrivning</th><th>Belopp</th><th>Betalat av</th></tr></thead><tbody id="expense-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- UTHYRNING -->
+<div class="sec" id="sec-uthyrning">
+  <div class="ptitle">Uthyrning</div>
+  <div class="psub">Gäster, bokningar och mailmallar</div>
+  <div class="dlinks">
+    <div class="dlink" data-drive="uthyrning"><span>📁</span><span class="dlink-n">Uthyrning-mappen</span><span>→</span></div>
+  </div>
+  <div class="acts">
+    <button class="btn pri" data-modal="guest">+ Ny bokning</button>
+    <button class="btn" data-claude="gastmail">Välkomstmail →</button>
+    <button class="btn" data-claude="avslutsmail">Avslutsmail →</button>
+    <button class="btn" data-claude="gastinfo">Gästinfo-dok →</button>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kl">Bokade nätter</div><div class="kv" id="nights">0</div></div>
+    <div class="kpi"><div class="kl">Intäkt 2025</div><div class="kv" id="income">0 kr</div></div>
+    <div class="kpi"><div class="kl">Antal gäster</div><div class="kv" id="guestcount">0</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Gästregister</div></div>
+    <div style="padding:0"><table><thead><tr><th>Gäst</th><th>Incheckning</th><th>Utcheckning</th><th>Plattform</th><th>Belopp</th><th>Kontakt</th></tr></thead><tbody id="guest-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- PROJEKT -->
+<div class="sec" id="sec-projekt">
+  <div class="ptitle">Projekt</div>
+  <div class="psub">Varje projekt har checklista, inköpslista och Claude-hjälp</div>
+  <div class="acts">
+    <button class="btn pri" data-modal="proj">+ Nytt projekt</button>
+    <button class="btn ylw" data-modal="import">Importera från Claude</button>
+    <button class="btn" data-claude="projekt">Fråga Claude om ett projekt →</button>
+  </div>
+  <div class="info">Beskriv ett projekt i Claude-chatten – ladda gärna upp bilder. Be sedan Claude: <em>"ge mig importkoden"</em>. Kopiera koden och klistra in via knappen ovan.</div>
+  <div id="proj-list"></div>
+  <div class="empty-state" id="proj-empty">
+    <p>Inga projekt ännu. Skapa ett nytt eller importera från Claude.</p>
+    <button class="btn pri" data-modal="proj">+ Skapa första projekt</button>
+  </div>
+</div>
+
+<!-- UPPDRAG -->
+<div class="sec" id="sec-uppdrag">
+  <div class="ptitle">Uppdrag</div>
+  <div class="psub">Samla flera projekt till ett tillfälle – dela och skriv ut</div>
+  <div class="acts">
+    <button class="btn pri" data-modal="mission">+ Nytt uppdrag</button>
+    <button class="btn ylw" id="btn-print-missions">Skriv ut alla uppdrag</button>
+  </div>
+  <div id="mission-list"></div>
+  <div class="empty-state" id="mission-empty">
+    <p>Inga uppdrag ännu. Samla 5–7 projekt till t.ex. en Valborg-helg.</p>
+    <button class="btn pri" data-modal="mission">+ Skapa första uppdrag</button>
+  </div>
+</div>
+
+<!-- BILDER -->
+<div class="sec" id="sec-bilder">
+  <div class="ptitle">Bilder</div>
+  <div class="psub">Ladda upp i Claude-chatten för analys och förbättringsförslag</div>
+  <div class="dlinks">
+    <div class="dlink" data-drive="bilder"><span>📁</span><span class="dlink-n">Bilder-mappen i Drive</span><span>→</span></div>
+  </div>
+  <div class="acts">
+    <button class="btn pri" data-claude="bilder">Analysera bilder med Claude →</button>
+    <button class="btn" data-claude="forbattringar">Förbättringsranking →</button>
+    <button class="btn" data-claude="fasad">Analysera fasad →</button>
+    <button class="btn" data-claude="tak">Analysera tak →</button>
+  </div>
+  <div class="info">Ladda upp bilder direkt i Claude-chatten (klicka på gem-ikonen). Claude analyserar och ger förbättringsförslag. Spara bilderna i Drive-mappen ovan.</div>
+  <div class="pgrid">
+    <div class="pthumb" data-claude="bilder"><div>+ Ladda upp</div><div style="font-size:.68rem">via Claude-chatten</div></div>
+    <div class="pthumb" data-claude="exteriör">Exteriör →</div>
+    <div class="pthumb" data-claude="tak">Tak →</div>
+    <div class="pthumb" data-claude="terrass">Terrass →</div>
+    <div class="pthumb" data-claude="interior">Interiör →</div>
+    <div class="pthumb" data-claude="tradgard">Trädgård →</div>
+  </div>
+</div>
+
+<!-- LISTOR -->
+<div class="sec" id="sec-listor">
+  <div class="ptitle">Listor</div>
+  <div class="psub">Att göra, inköp och packlista</div>
+  <div class="acts">
+    <button class="btn pri" data-modal="todo">+ Att göra</button>
+    <button class="btn pri" data-modal="purchase">+ Inköp</button>
+    <button class="btn" data-claude="inkop">Föreslå inköp med Claude →</button>
+    <button class="btn" data-claude="packlista">Packlista med Claude →</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+    <div class="card">
+      <div class="ch"><div class="ct">Att göra</div><button class="btn" style="font-size:.78rem;padding:4px 10px" data-modal="todo">+</button></div>
+      <div class="cb"><div class="cl" id="todo-list"></div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Inköp</div><button class="btn" style="font-size:.78rem;padding:4px 10px" data-modal="purchase">+</button></div>
+      <div class="cb"><div class="cl" id="purchase-list"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BILDBOKEN -->
+<div class="sec" id="sec-bildboken">
+  <div class="ptitle">Bildboken om Backerum</div>
+  <div class="psub">Dokumentera husets historia – för familjen och framtiden</div>
+  <div class="acts">
+    <button class="btn pri" data-claude="bildboken">Planera hela boken →</button>
+    <button class="btn" data-claude="forord">Skriv förord →</button>
+    <button class="btn" data-claude="kapitel">Nästa kapitel →</button>
+    <button class="btn" data-claude="tryck">Jämför tryckerier →</button>
+  </div>
+  <div class="dlinks">
+    <div class="dlink" data-drive="bildboken"><span>📁</span><span class="dlink-n">Bildboken-mappen i Drive</span><span>→</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+    <div class="card" style="cursor:pointer" data-claude="kap1"><div class="ch"><div class="ct">Kapitel 1 – Husets historia</div></div><div class="cb" style="font-size:.84rem;color:var(--ink3)">Vad vet vi om huset innan ni köpte det?</div></div>
+    <div class="card" style="cursor:pointer" data-claude="kap2"><div class="ch"><div class="ct">Kapitel 2 – Köpet & drömmen</div></div><div class="cb" style="font-size:.84rem;color:var(--ink3)">Varför valde ni Backerum?</div></div>
+    <div class="card" style="cursor:pointer" data-claude="kap3"><div class="ch"><div class="ct">Kapitel 3 – Renoveringarna</div></div><div class="cb" style="font-size:.84rem;color:var(--ink3)">Före & efter, med bilder.</div></div>
+  </div>
+</div>
+
+<!-- DOKUMENT -->
+<div class="sec" id="sec-dokument">
+  <div class="ptitle">Dokument</div>
+  <div class="psub">Köpehandlingar, ritningar och tillstånd</div>
+  <div class="dlinks">
+    <div class="dlink" data-drive="dokument"><span>📁</span><span class="dlink-n">Dokument-mappen i Drive</span><span>→</span></div>
+    <div class="dlink" data-drive="kopehandlingar"><span>📄</span><span class="dlink-n">Köpehandlingar & lagfart</span><span>→</span></div>
+    <div class="dlink" data-drive="ritningar"><span>📐</span><span class="dlink-n">Ritningar & tomtkarta</span><span>→</span></div>
+    <div class="dlink" data-drive="tillstand"><span>🏛️</span><span class="dlink-n">Tillstånd & myndighetskontakter</span><span>→</span></div>
+  </div>
+</div>
+
+</main>
+
+<!-- ===== MODALER ===== -->
+
+<!-- Drive config -->
+<div class="ov" id="ov-drive">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Konfigurera Google Drive-länkar</div><button class="mx" data-close="drive">×</button></div>
+    <div class="mb">
+      <p style="font-size:.83rem;color:var(--ink3);margin-bottom:14px">Högerklicka på varje mapp i Google Drive → "Kopiera länk" → klistra in nedan.</p>
+      <div id="drive-fields"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="drive">Avbryt</button><button class="btn pri" id="btn-save-drive">Spara</button></div>
+  </div>
+</div>
+
+<!-- Ny kostnad -->
+<div class="ov" id="ov-expense">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Logga kostnad</div><button class="mx" data-close="expense">×</button></div>
+    <div class="mb">
+      <div class="fg">
+        <div class="fr"><div class="fl">Datum</div><input class="fi" type="date" id="exp-date"></div>
+        <div class="fr"><div class="fl">Belopp (kr)</div><input class="fi" type="number" id="exp-amount" placeholder="0"></div>
+      </div>
+      <div class="fr"><div class="fl">Kategori</div>
+        <select class="fs" id="exp-cat"><option>Fasta kostnader</option><option>El & uppvärmning</option><option>Reparationer</option><option>Trädgård</option><option>Rengöring</option><option>Uthyrning – avgifter</option><option>Inköp & inventarier</option><option>Projekt & renovering</option><option>Övrigt</option></select>
+      </div>
+      <div class="fr"><div class="fl">Beskrivning</div><input class="fi" type="text" id="exp-desc" placeholder="t.ex. Elräkning mars"></div>
+      <div class="fr"><div class="fl">Betalat av</div><input class="fi" type="text" id="exp-paid" placeholder="t.ex. Stugkonto"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="expense">Avbryt</button><button class="btn pri" id="btn-save-expense">Spara kostnad</button></div>
+  </div>
+</div>
+
+<!-- Ny gäst -->
+<div class="ov" id="ov-guest">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Ny gästbokning</div><button class="mx" data-close="guest">×</button></div>
+    <div class="mb">
+      <div class="fr"><div class="fl">Gästens namn</div><input class="fi" type="text" id="guest-name" placeholder="Förnamn Efternamn"></div>
+      <div class="fg">
+        <div class="fr"><div class="fl">Incheckning</div><input class="fi" type="date" id="guest-in"></div>
+        <div class="fr"><div class="fl">Utcheckning</div><input class="fi" type="date" id="guest-out"></div>
+      </div>
+      <div class="fg">
+        <div class="fr"><div class="fl">Plattform</div><select class="fs" id="guest-platform"><option>Stugknuten</option><option>Stugnet</option><option>Airbnb</option><option>Direkt</option></select></div>
+        <div class="fr"><div class="fl">Belopp (kr)</div><input class="fi" type="number" id="guest-amount" placeholder="0"></div>
+      </div>
+      <div class="fr"><div class="fl">Kontakt</div><input class="fi" type="text" id="guest-contact" placeholder="mail eller telefon"></div>
+      <div class="fr"><div class="fl">Anteckning</div><textarea class="ft" id="guest-note" placeholder="Antal personer, önskemål..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="guest">Avbryt</button><button class="btn pri" id="btn-save-guest">Spara bokning</button></div>
+  </div>
+</div>
+
+<!-- Nytt projekt -->
+<div class="ov" id="ov-proj">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Nytt projekt</div><button class="mx" data-close="proj">×</button></div>
+    <div class="mb">
+      <div class="fr"><div class="fl">Projektnamn</div><input class="fi" type="text" id="proj-name" placeholder="t.ex. Sätta upp gardinstänger"></div>
+      <div class="fg">
+        <div class="fr"><div class="fl">Kategori</div><select class="fs" id="proj-cat"><option>Utomhus</option><option>Inomhus</option><option>Trädgård</option><option>Bryggan</option><option>Renovering</option><option>Övrigt</option></select></div>
+        <div class="fr"><div class="fl">Budget (kr)</div><input class="fi" type="number" id="proj-budget" placeholder="0"></div>
+      </div>
+      <div class="fr"><div class="fl">Beskrivning</div><textarea class="ft" id="proj-desc" placeholder="Vad ska göras och varför?"></textarea></div>
+      <div class="fr"><div class="fl">Att göra (en per rad)</div><textarea class="ft" id="proj-todos" placeholder="Rensa ogräs&#10;Tvätta plattor&#10;Strö fogsand"></textarea></div>
+      <div class="fr"><div class="fl">Inköp (en per rad)</div><textarea class="ft" id="proj-items" placeholder="Fogsand&#10;Högtryckstvätt&#10;Borste"></textarea></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="proj">Avbryt</button><button class="btn pri" id="btn-save-proj">Spara projekt</button></div>
+  </div>
+</div>
+
+<!-- Importera projekt -->
+<div class="ov" id="ov-import">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Importera projekt från Claude</div><button class="mx" data-close="import">×</button></div>
+    <div class="mb">
+      <div class="info" style="margin-bottom:12px">
+        1. Beskriv projektet för Claude i chatten<br>
+        2. Be Claude: <em>"ge mig importkoden"</em><br>
+        3. Kopiera och klistra in koden nedan
+      </div>
+      <div class="fr"><div class="fl">Klistra in importkoden här</div><textarea class="ft" id="import-text" style="min-height:120px;font-family:monospace;font-size:.8rem" placeholder='BACKERUM_IMPORT:{"name":"...","cat":"...","todos":[...],"items":[...]}'></textarea></div>
+      <div id="import-err" style="display:none;color:#C0392B;font-size:.82rem;margin-top:4px"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="import">Avbryt</button><button class="btn pri" id="btn-do-import">Importera projekt</button></div>
+  </div>
+</div>
+
+<!-- Nytt uppdrag -->
+<div class="ov" id="ov-mission">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Nytt uppdrag</div><button class="mx" data-close="mission">×</button></div>
+    <div class="mb">
+      <div class="fr"><div class="fl">Uppdragsnamn</div><input class="fi" type="text" id="mission-name" placeholder="t.ex. Valborg – fixhelg med familjen"></div>
+      <div class="fr"><div class="fl">Datum / period</div><input class="fi" type="text" id="mission-date" placeholder="t.ex. 30 apr – 2 maj 2025"></div>
+      <div class="fr"><div class="fl">Välj projekt att inkludera</div><div id="mission-proj-sel" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div></div>
+      <div class="fr"><div class="fl">Glöm inte (en per rad)</div><textarea class="ft" id="mission-extras" placeholder="Handla mat&#10;Ta med verktygslådan&#10;Kolla vattnet"></textarea></div>
+      <div class="fr"><div class="fl">Deltagare</div><input class="fi" type="text" id="mission-people" placeholder="t.ex. Erik, Anna, familjen Svensson"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="mission">Avbryt</button><button class="btn pri" id="btn-save-mission">Spara uppdrag</button></div>
+  </div>
+</div>
+
+<!-- Ny att-göra -->
+<div class="ov" id="ov-todo">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Ny att-göra</div><button class="mx" data-close="todo">×</button></div>
+    <div class="mb">
+      <div class="fr"><div class="fl">Uppgift</div><input class="fi" type="text" id="todo-text" placeholder="t.ex. Ringa VVS-firman"></div>
+      <div class="fr"><div class="fl">Prioritet</div><select class="fs" id="todo-prio"><option value="high">Hög</option><option value="med" selected>Medel</option><option value="low">Låg</option></select></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="todo">Avbryt</button><button class="btn pri" id="btn-save-todo">Spara</button></div>
+  </div>
+</div>
+
+<!-- Nytt inköp -->
+<div class="ov" id="ov-purchase">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Nytt inköp</div><button class="mx" data-close="purchase">×</button></div>
+    <div class="mb">
+      <div class="fr"><div class="fl">Artikel</div><input class="fi" type="text" id="pur-text" placeholder="t.ex. Fogsand, 3 säckar"></div>
+      <div class="fr"><div class="fl">Ungefärligt pris (kr)</div><input class="fi" type="number" id="pur-price" placeholder="0"></div>
+      <div class="fr"><div class="fl">Var köps det?</div><input class="fi" type="text" id="pur-where" placeholder="t.ex. Bauhaus"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="purchase">Avbryt</button><button class="btn pri" id="btn-save-purchase">Spara</button></div>
+  </div>
+</div>
+
+<!-- Guide – klistra in från Claude -->
+<div class="ov" id="ov-guide">
+  <div class="modal" style="max-width:580px">
+    <div class="mh">
+      <div>
+        <div class="mh-t" id="guide-modal-title">Guide – Hur gör man?</div>
+        <div style="font-size:.77rem;color:var(--ink3);margin-top:2px" id="guide-modal-sub"></div>
+      </div>
+      <button class="mx" data-close="guide">×</button>
+    </div>
+    <div class="mb" style="padding:16px">
+      <div class="info" style="margin-bottom:12px">
+        <strong>Så här gör du:</strong><br>
+        1. Fråga Claude i chatten: <em>"Hur gör jag projektet [projektnamn] steg för steg?"</em><br>
+        2. Kopiera Claudes svar<br>
+        3. Klistra in nedan och spara – guiden sparas på projektkortet
+      </div>
+      <div class="fr">
+        <div class="fl">Klistra in guide från Claude</div>
+        <textarea class="ft" id="guide-paste" style="min-height:180px" placeholder="Klistra in Claudes svar här..."></textarea>
+      </div>
+      <div class="fr" style="margin-top:8px">
+        <div class="fl">Egna anteckningar (valfritt)</div>
+        <textarea class="ft" id="guide-notes" style="min-height:60px" placeholder="T.ex. kontakter, verktyg du har hemma, tips från förra gången..."></textarea>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn" data-close="guide">Avbryt</button>
+      <button class="btn pri" id="btn-save-guide">Spara guide i projektet</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STORAGE ──────────────────────────────────────
+function load(k,d){try{var v=localStorage.getItem('br_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function save(k,v){localStorage.setItem('br_'+k,JSON.stringify(v));}
+
+var driveLinks=load('drive',{});
+var expenses=load('expenses',[]);
+var guests=load('guests',[]);
+var projects=load('projects',[]);
+var missions=load('missions',[]);
+var todos=load('todos',[]);
+var purchases=load('purchases',[]);
+
+// ── DRIVE CONFIG ──────────────────────────────────
+var DRIVE_KEYS=['ekonomi','budget','uthyrning','projekt','bilder','bildboken','dokument','kopehandlingar','ritningar','tillstand'];
+var DRIVE_LABELS={ekonomi:'Ekonomi-mappen',budget:'Budget_Backerum.xlsx',uthyrning:'Uthyrning-mappen',projekt:'Projekt-mappen',bilder:'Bilder-mappen',bildboken:'Bildboken-mappen',dokument:'Dokument-mappen',kopehandlingar:'Köpehandlingar',ritningar:'Ritningar',tillstand:'Tillstånd'};
+
+// ── CLAUDE PROMPTS ────────────────────────────────
+var PROMPTS={
+  budget:'Hjälp mig uppdatera budget-arket för Backerum. Ställ mig frågor om vad som ska ändras.',
+  gastmail:'Skriv ett välkomstmail till nästa gäst på Backerum. Fråga mig om namn och datum.',
+  avslutsmail:'Skriv ett avslutsmail med feedback-frågor för gäster på Backerum.',
+  gastinfo:'Skapa ett gästinfo-dokument med husregler och tips för Backerum.',
+  projekt:'Hjälp mig med ett projekt på Backerum. Fråga vilket projekt och ge steg-för-steg-hjälp.',
+  bilder:'Jag laddar upp bilder på Backerum nu. Analysera och ge förbättringsförslag.',
+  forbattringar:'Ge mig en ranking av de 5 viktigaste förbättringarna för Backerum.',
+  fasad:'Analysera fasaden på Backerum och ge råd om vad som bör åtgärdas.',
+  tak:'Analysera taket på Backerum och ge mig råd.',
+  exteriör:'Analysera exteriören på Backerum och ge förbättringsförslag.',
+  terrass:'Analysera terrassen på Backerum och föreslå förbättringar.',
+  interior:'Analysera interiören på Backerum och ge inredningsförslag.',
+  tradgard:'Ge mig råd om trädgårdsskötsel för Backerum.',
+  inkop:'Vad behöver vi köpa till Backerum inför sommaren? Ge en komplett lista.',
+  packlista:'Skapa en packlista för Backerum.',
+  bildboken:'Hjälp mig planera bildboken om Backerum – kapitelstruktur och innehåll.',
+  forord:'Skriv ett utkast till förordet i bildboken om Backerum.',
+  kapitel:'Hjälp mig skriva nästa kapitel i bildboken om Backerum.',
+  tryck:'Jämför tryckerier för bildboken – Photobox, Albelli, Saal Digital m.fl.',
+  kap1:'Hjälp mig skriva kapitel 1 i bildboken – husets historia innan vi köpte det.',
+  kap2:'Hjälp mig skriva kapitel 2 – varför vi valde Backerum och våra drömmar.',
+  kap3:'Hjälp mig skriva kapitel 3 – renoveringarna med före och efter-bilder.'
+};
+
+function claudePrompt(key){
+  var txt=PROMPTS[key]||'Hjälp mig med Backerum – '+key;
+  alert('Kopiera och klistra in i Claude-chatten:\n\n'+txt);
+}
+
+function openDrive(key){
+  var url=driveLinks[key];
+  if(url){window.open(url,'_blank');}
+  else{alert('Drive-länk för "'+DRIVE_LABELS[key]+'" är inte konfigurerad än.\n\nKlicka på "Konfigurera Drive-länkar" på startsidan.');}
+}
+
+// ── NAVIGATION ────────────────────────────────────
+function showSec(id){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  var el=document.getElementById('sec-'+id);
+  if(el)el.classList.add('on');
+  document.querySelectorAll('.ntab').forEach(function(t){
+    t.classList.toggle('on',t.dataset.sec===id);
+  });
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('.ntab').forEach(function(t){
+  t.addEventListener('click',function(){showSec(this.dataset.sec);});
+});
+
+// ── MODAL ─────────────────────────────────────────
+function openModal(name){
+  if(name==='drive'){buildDriveFields();}
+  if(name==='mission'){buildMissionSel();}
+  var el=document.getElementById('ov-'+name);
+  if(el)el.classList.add('on');
+}
+function closeModal(name){
+  var el=document.getElementById('ov-'+name);
+  if(el)el.classList.remove('on');
+  if(name==='mission'){
+    editingMissionId=null;
+    document.querySelector('#ov-mission .mh-t').textContent='Nytt uppdrag';
+    document.getElementById('btn-save-mission').textContent='Spara uppdrag';
+  }
+}
+
+document.querySelectorAll('.ov').forEach(function(ov){
+  ov.addEventListener('click',function(e){
+    if(e.target===ov){
+      ov.classList.remove('on');
+      if(ov.id==='ov-mission'){
+        editingMissionId=null;
+        document.querySelector('#ov-mission .mh-t').textContent='Nytt uppdrag';
+        document.getElementById('btn-save-mission').textContent='Spara uppdrag';
+      }
+    }
+  });
+});
+
+// ── EVENT DELEGATION – alla knappar och tiles ─────
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-modal],[data-goto],[data-drive],[data-claude],[data-close]');
+  if(!el)return;
+  e.stopPropagation();
+
+  if(el.dataset.modal)  openModal(el.dataset.modal);
+  if(el.dataset.goto)   showSec(el.dataset.goto);
+  if(el.dataset.drive)  openDrive(el.dataset.drive);
+  if(el.dataset.claude) claudePrompt(el.dataset.claude);
+  if(el.dataset.close)  closeModal(el.dataset.close);
+});
+
+// Header buttons
+document.getElementById('btn-new-proj').addEventListener('click',function(){openModal('proj');});
+document.getElementById('btn-new-mission').addEventListener('click',function(){openModal('mission');});
+document.getElementById('btn-print').addEventListener('click',function(){printAll();});
+document.getElementById('btn-drive-config').addEventListener('click',function(){openModal('drive');});
+document.getElementById('btn-print-missions').addEventListener('click',function(){printAll();});
+
+// ── DRIVE CONFIG ──────────────────────────────────
+function buildDriveFields(){
+  var el=document.getElementById('drive-fields');
+  el.innerHTML=DRIVE_KEYS.map(function(k){
+    return '<div class="fr"><div class="fl">'+DRIVE_LABELS[k]+'</div><input class="fi" type="url" id="dc-'+k+'" value="'+(driveLinks[k]||'')+'" placeholder="https://drive.google.com/drive/folders/..."></div>';
+  }).join('');
+}
+document.getElementById('btn-save-drive').addEventListener('click',function(){
+  DRIVE_KEYS.forEach(function(k){
+    var v=document.getElementById('dc-'+k);
+    if(v&&v.value.trim())driveLinks[k]=v.value.trim();
+  });
+  save('drive',driveLinks);
+  closeModal('drive');
+  alert('Drive-länkarna sparade!');
+});
+
+// ── EXPENSES ──────────────────────────────────────
+document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);
+document.getElementById('btn-save-expense').addEventListener('click',function(){
+  var desc=document.getElementById('exp-desc').value.trim();
+  if(!desc){alert('Ange en beskrivning');return;}
+  expenses.unshift({date:document.getElementById('exp-date').value,amount:parseInt(document.getElementById('exp-amount').value)||0,cat:document.getElementById('exp-cat').value,desc:desc,paid:document.getElementById('exp-paid').value});
+  save('expenses',expenses);
+  renderExpenses();
+  closeModal('expense');
+  document.getElementById('exp-desc').value='';
+  document.getElementById('exp-amount').value='';
+});
+function renderExpenses(){
+  var tb=document.getElementById('expense-body');
+  if(!expenses.length){tb.innerHTML='<tr><td colspan="5" class="empty-td">Inga kostnader loggade ännu</td></tr>';updateKPIs();return;}
+  tb.innerHTML=expenses.map(function(e){return '<tr><td>'+e.date+'</td><td><span class="badge bs">'+e.cat+'</span></td><td>'+e.desc+'</td><td style="font-weight:500">'+e.amount.toLocaleString('sv')+' kr</td><td>'+(e.paid||'–')+'</td></tr>';}).join('');
+  updateKPIs();
+}
+
+// ── GUESTS ────────────────────────────────────────
+document.getElementById('btn-save-guest').addEventListener('click',function(){
+  var name=document.getElementById('guest-name').value.trim();
+  if(!name){alert('Ange gästens namn');return;}
+  guests.unshift({name:name,in:document.getElementById('guest-in').value,out:document.getElementById('guest-out').value,platform:document.getElementById('guest-platform').value,amount:parseInt(document.getElementById('guest-amount').value)||0,contact:document.getElementById('guest-contact').value,note:document.getElementById('guest-note').value});
+  save('guests',guests);
+  renderGuests();
+  closeModal('guest');
+  document.getElementById('guest-name').value='';
+});
+function renderGuests(){
+  var tb=document.getElementById('guest-body');
+  var pc={Airbnb:'br',Stugknuten:'bg',Stugnet:'bb',Direkt:'bs'};
+  if(!guests.length){tb.innerHTML='<tr><td colspan="6" class="empty-td">Inga gästbokningar ännu</td></tr>';updateKPIs();return;}
+  tb.innerHTML=guests.map(function(g){return '<tr><td style="font-weight:500">'+g.name+'</td><td>'+(g.in||'–')+'</td><td>'+(g.out||'–')+'</td><td><span class="badge '+(pc[g.platform]||'bs')+'">'+g.platform+'</span></td><td>'+(g.amount?g.amount.toLocaleString('sv')+' kr':'–')+'</td><td style="font-size:.82rem;color:var(--ink3)">'+(g.contact||'–')+'</td></tr>';}).join('');
+  document.getElementById('guestcount').textContent=guests.length;
+  var tot=guests.reduce(function(s,g){return s+g.amount;},0);
+  document.getElementById('income').textContent=tot.toLocaleString('sv')+' kr';
+  var nights=0;
+  guests.forEach(function(g){if(g.in&&g.out){var d=(new Date(g.out)-new Date(g.in))/86400000;if(d>0)nights+=d;}});
+  document.getElementById('nights').textContent=Math.round(nights);
+  updateKPIs();
+}
+
+// ── PROJECTS ──────────────────────────────────────
+document.getElementById('btn-save-proj').addEventListener('click',function(){
+  var name=document.getElementById('proj-name').value.trim();
+  if(!name){alert('Ange projektnamn');return;}
+  var todosRaw=document.getElementById('proj-todos').value.split('\n').filter(function(t){return t.trim();});
+  var itemsRaw=document.getElementById('proj-items').value.split('\n').filter(function(t){return t.trim();});
+  projects.unshift({id:Date.now(),name:name,cat:document.getElementById('proj-cat').value,budget:parseInt(document.getElementById('proj-budget').value)||0,desc:document.getElementById('proj-desc').value.trim(),todos:todosRaw.map(function(t){return{text:t.trim(),done:false};}),items:itemsRaw.map(function(t){return{text:t.trim(),done:false};}),progress:0,created:new Date().toISOString().slice(0,10)});
+  save('projects',projects);
+  renderProjects();
+  closeModal('proj');
+  ['proj-name','proj-budget','proj-desc','proj-todos','proj-items'].forEach(function(id){document.getElementById(id).value='';});
+});
+
+document.getElementById('btn-do-import').addEventListener('click',function(){
+  var raw=document.getElementById('import-text').value.trim();
+  var errEl=document.getElementById('import-err');
+  errEl.style.display='none';
+  try{
+    var prefix='BACKERUM_IMPORT:';
+    var json=raw.startsWith(prefix)?raw.slice(prefix.length):raw;
+    var d=JSON.parse(json);
+    if(!d.name)throw new Error('Saknar namn');
+    projects.unshift({id:Date.now(),name:d.name,cat:d.cat||'Utomhus',budget:d.budget||0,desc:d.desc||'',todos:(d.todos||[]).map(function(t){return{text:t,done:false};}),items:(d.items||[]).map(function(t){return{text:t,done:false};}),progress:0,created:new Date().toISOString().slice(0,10)});
+    save('projects',projects);
+    renderProjects();
+    closeModal('import');
+    document.getElementById('import-text').value='';
+    showSec('projekt');
+  }catch(e){
+    errEl.textContent='Kunde inte läsa koden – kontrollera att du kopierat allt.';
+    errEl.style.display='block';
+  }
+});
+
+function chk(){return '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';}
+
+function toggleProjItem(pid,idx,isBuy){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var arr=isBuy?p.items:p.todos;
+  arr[idx].done=!arr[idx].done;
+  var total=p.todos.length+p.items.length;
+  var done=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;
+  p.progress=total?Math.round(done/total*100):0;
+  save('projects',projects);
+  renderProjects();
+}
+
+function delProject(pid){
+  if(!confirm('Ta bort projektet?'))return;
+  projects=projects.filter(function(p){return p.id!==pid;});
+  save('projects',projects);
+  renderProjects();
+}
+
+function renderProjects(){
+  var el=document.getElementById('proj-list');
+  var em=document.getElementById('proj-empty');
+  if(!projects.length){el.innerHTML='';em.style.display='block';updateKPIs();return;}
+  em.style.display='none';
+  var catCol={Utomhus:'#3B6D11',Inomhus:'#185FA5',Trädgård:'#2D7A4F',Bryggan:'#0F6E56',Renovering:'#854F0B',Övrigt:'#5F5E5A'};
+  el.innerHTML=projects.map(function(p){
+    var cc=catCol[p.cat]||'#5F5E5A';
+    var dt=p.todos.filter(function(t){return t.done;}).length;
+    var di=p.items.filter(function(t){return t.done;}).length;
+    var pct=p.progress;
+    var pcolor=pct===100?'#1A4D2E':pct>0?'#D48B2E':'#9e9e8e';
+
+    var thtml=p.todos.map(function(t,i){
+      return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',false)"><div class="cb2">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
+    }).join('');
+    var ihtml=p.items.map(function(t,i){
+      return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',true)"><div class="cb2 sq">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
+    }).join('');
+
+    return '<div class="pc">'+
+      '<div class="pc-top"><div class="pc-bar" style="background:'+cc+'"></div>'+
+      '<div class="pc-info">'+
+      '<div><div class="pc-name">'+p.name+'</div><div class="pc-meta" style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:'+cc+';display:inline-block"></span>'+p.cat+(p.budget?' &nbsp;·&nbsp; '+p.budget.toLocaleString('sv')+' kr':'')+'&nbsp;·&nbsp;'+p.created+'</div></div>'+
+      '<div class="pc-pct" style="color:'+pcolor+'">'+pct+'%</div></div></div>'+
+      '<div class="pc-prog"><div class="pc-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="pc-body">'+
+      '<div class="pc-left">'+
+      (p.desc?'<div class="pc-desc">'+p.desc+'</div>':'')+
+      '<div class="pc-stats">'+
+      '<div class="pc-stat" style="background:var(--gp)"><div class="pc-stat-v" style="color:#1A4D2E">'+dt+'/'+p.todos.length+'</div><div class="pc-stat-l">Steg klara</div></div>'+
+      '<div class="pc-stat" style="background:var(--ap)"><div class="pc-stat-v" style="color:#854F0B">'+di+'/'+p.items.length+'</div><div class="pc-stat-l">Inköp klara</div></div>'+
+      '</div>'+
+      '<div class="pc-btns">'+
+      '<button class="btn pri" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
+      '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort projekt</button>'+
+      '</div></div>'+
+      '<div class="pc-right">'+
+      (p.todos.length?'<div class="cl-head" style="color:#1A4D2E">ATT GÖRA</div>'+thtml:'')+ 
+      (p.items.length?'<div class="cl-head" style="color:#854F0B;margin-top:'+(p.todos.length?'10px':'0')+'">INKÖP</div>'+ihtml:'')+ 
+      (!p.todos.length&&!p.items.length?'<div style="color:var(--ink3);font-size:.84rem">Inga punkter</div>':'')+
+      '</div></div>'+
+      (p.guide?'<div style="border-top:1px solid var(--s);padding:14px 16px;background:#f9faf7"><div style="font-size:.72rem;font-weight:500;color:#1A4D2E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">GUIDE FRÅN CLAUDE</div><div style="font-size:.86rem;color:var(--ink2);line-height:1.65;white-space:pre-wrap">'+p.guide+'</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn" style="font-size:.78rem" onclick="openGuide('+p.id+')">Uppdatera guide</button><button class="btn red" style="font-size:.78rem" onclick="clearGuide('+p.id+')">Ta bort guide</button></div></div>':'')+ 
+      '</div>';
+  }).join('');
+  updateKPIs();
+}
+
+// ── MISSIONS ──────────────────────────────────────
+function buildMissionSel(){
+  var el=document.getElementById('mission-proj-sel');
+  if(!projects.length){el.innerHTML='<div style="font-size:.82rem;color:var(--ink3)">Inga projekt ännu – skapa ett projekt först.</div>';return;}
+  el.innerHTML=projects.map(function(p){
+    return '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.87rem;padding:6px 8px;border-radius:5px;border:1px solid var(--s)"><input type="checkbox" name="mp" value="'+p.id+'" style="accent-color:#1A4D2E">'+p.name+' <span style="color:var(--ink3);font-size:.76rem">('+p.progress+'%)</span></label>';
+  }).join('');
+}
+
+document.getElementById('btn-save-mission').addEventListener('click',function(){
+  var name=document.getElementById('mission-name').value.trim();
+  if(!name){alert('Ange uppdragsnamn');return;}
+  var ids=Array.from(document.querySelectorAll('input[name="mp"]:checked')).map(function(x){return parseInt(x.value);});
+  var extrasRaw=document.getElementById('mission-extras').value.split('\n').filter(function(t){return t.trim();});
+  var people=document.getElementById('mission-people').value;
+  var date=document.getElementById('mission-date').value;
+
+  if(editingMissionId) {
+    // Redigera befintligt uppdrag
+    var m=missions.find(function(x){return x.id===editingMissionId;});
+    if(m){
+      m.name=name; m.date=date; m.people=people; m.projectIds=ids;
+      // Behåll gjorda extra-punkter, lägg till nya
+      var existingTexts=m.extras.map(function(e){return e.text;});
+      extrasRaw.forEach(function(t){
+        if(!existingTexts.includes(t)) m.extras.push({text:t,done:false});
+      });
+      // Ta bort de som tagits bort ur textarea
+      m.extras=m.extras.filter(function(e){return extrasRaw.includes(e.text);});
+    }
+    editingMissionId=null;
+  } else {
+    // Nytt uppdrag
+    missions.unshift({id:Date.now(),name:name,date:date,projectIds:ids,extras:extrasRaw.map(function(t){return{text:t,done:false};}),people:people,created:new Date().toISOString().slice(0,10)});
+  }
+
+  save('missions',missions);
+  renderMissions();
+  closeModal('mission');
+
+  // Återställ modal-rubriken
+  document.querySelector('#ov-mission .mh-t').textContent='Nytt uppdrag';
+  document.getElementById('btn-save-mission').textContent='Spara uppdrag';
+  document.getElementById('mission-name').value='';
+  document.getElementById('mission-date').value='';
+  document.getElementById('mission-extras').value='';
+  document.getElementById('mission-people').value='';
+});
+
+function toggleMissionExtra(mid,idx){
+  var m=missions.find(function(x){return x.id===mid;});
+  if(m){m.extras[idx].done=!m.extras[idx].done;save('missions',missions);renderMissions();}
+}
+function delMission(mid){
+  if(!confirm('Ta bort uppdraget?'))return;
+  missions=missions.filter(function(m){return m.id!==mid;});
+  save('missions',missions);
+  renderMissions();
+}
+function shareMission(mid){
+  var m=missions.find(function(x){return x.id===mid;});
+  if(!m)return;
+  var mps=projects.filter(function(p){return m.projectIds.includes(p.id);});
+  var txt='BACKERUM: '+m.name+'\n'+(m.date?m.date+'\n':'')+(m.people?'Deltagare: '+m.people+'\n':'')+'\n';
+  mps.forEach(function(p){txt+='\n▸ '+p.name+'\n';p.todos.forEach(function(t){txt+='  ☐ '+t.text+'\n';});if(p.items.length){txt+='  Inköp: '+p.items.map(function(i){return i.text;}).join(', ')+'\n';}});
+  if(m.extras.length){txt+='\nGLÖM INTE:\n';m.extras.forEach(function(e){txt+='  ☐ '+e.text+'\n';});}
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){alert('Kopierat! Klistra in i ett mail eller meddelande.');}).catch(function(){alert(txt);});}else{alert(txt);}
+}
+function printMission(mid){
+  var m=missions.find(function(x){return x.id===mid;});
+  if(!m)return;
+  var mps=projects.filter(function(p){return m.projectIds.includes(p.id);});
+
+  // Välj vad som ska vara med
+  var inclGuide=confirm('Vill du ta med guider (hur man gör) i utskriften?');
+  var inclItems=confirm('Vill du ta med inköpslistor i utskriften?');
+
+  var w=window.open('','_blank');
+  var css='body{font-family:Georgia,serif;max-width:720px;margin:36px auto;color:#1c1c1a;line-height:1.65}'+
+    'h1{font-size:2rem;margin-bottom:4px;font-family:Georgia,serif}'+
+    'h2{font-size:1.1rem;font-weight:700;margin:28px 0 10px;padding:8px 12px;background:#EAF3DE;border-left:4px solid #1A4D2E;border-radius:0 6px 6px 0}'+
+    'h3{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#555;margin:14px 0 6px}'+
+    '.meta{color:#666;font-size:.88rem;margin-bottom:6px}'+
+    '.people{font-size:.9rem;color:#333;margin-bottom:24px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;display:inline-block}'+
+    'ul{margin:0 0 0 4px;padding:0;list-style:none}'+
+    'li{padding:4px 0;display:flex;align-items:flex-start;gap:10px;font-size:.92rem}'+
+    '.b{width:14px;height:14px;border:1.5px solid #333;border-radius:50%;flex-shrink:0;margin-top:3px}'+
+    '.bs{border-radius:3px}'+
+    '.guide{background:#f8faf7;border:1px solid #b8ddc2;border-radius:8px;padding:14px;font-size:.86rem;white-space:pre-wrap;margin:10px 0;line-height:1.65;color:#2a2a2a}'+
+    '.notes{background:#FDF3E0;border:1px solid #e8c98a;border-radius:6px;padding:10px 12px;font-size:.84rem;margin-top:8px;white-space:pre-wrap}'+
+    '.extras-box{border:1px solid #ddd;border-radius:8px;padding:14px;margin-top:20px}'+
+    '.proj-block{border:1px solid #e0e0d8;border-radius:10px;padding:16px 18px;margin-bottom:18px;break-inside:avoid}'+
+    '.pct{float:right;font-size:.85rem;color:#888;font-weight:400}'+
+    '@media print{body{margin:16px}.no-print{display:none}h2{break-after:avoid}.proj-block{break-inside:avoid}}';
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+m.name+'</title><style>'+css+'</style></head><body>';
+  html+='<h1>'+m.name+'</h1>';
+  html+='<div class="meta">'+(m.date?'<strong>'+m.date+'</strong> &nbsp;·&nbsp; ':'')+'Backerum</div>';
+  if(m.people) html+='<div class="people">Deltagare: '+m.people+'</div>';
+  html+='<hr style="border:none;border-top:1px solid #ddd;margin:18px 0">';
+
+  mps.forEach(function(p,i){
+    html+='<div class="proj-block">';
+    html+='<h2>Projekt '+(i+1)+': '+p.name+'<span class="pct">'+p.progress+'% klart</span></h2>';
+    if(p.desc) html+='<p style="font-size:.88rem;color:#555;margin-bottom:12px">'+p.desc+'</p>';
+    if(p.todos.length){
+      html+='<h3>Att göra</h3><ul>';
+      p.todos.forEach(function(t){html+='<li><div class="b'+(t.done?'" style="background:#1A4D2E;border-color:#1A4D2E':'')+'">'+(t.done?'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" fill="none"/></svg>':'')+'</div>'+t.text+'</li>';});
+      html+='</ul>';
+    }
+    if(inclItems && p.items.length){
+      html+='<h3>Inköp</h3><ul>';
+      p.items.forEach(function(t){html+='<li><div class="b bs'+(t.done?'" style="background:#D48B2E;border-color:#D48B2E':'')+'">'+(t.done?'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" fill="none"/></svg>':'')+'</div>'+t.text+'</li>';});
+      html+='</ul>';
+    }
+    if(inclGuide && p.guide){
+      html+='<h3>Guide</h3><div class="guide">'+p.guide.replace(/</g,'&lt;')+'</div>';
+      if(p.guideNotes) html+='<div class="notes"><strong>Egna anteckningar:</strong><br>'+p.guideNotes.replace(/</g,'&lt;')+'</div>';
+    }
+    html+='</div>';
+  });
+
+  if(m.extras.length){
+    html+='<div class="extras-box"><h3 style="margin-top:0">Glöm inte</h3><ul>';
+    m.extras.forEach(function(e){html+='<li><div class="b'+(e.done?'" style="background:#1A4D2E;border-color:#1A4D2E':'')+'">'+(e.done?'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" fill="none"/></svg>':'')+'</div>'+e.text+'</li>';});
+    html+='</ul></div>';
+  }
+
+  html+='<p style="font-size:.75rem;color:#aaa;margin-top:32px;text-align:center">Backerum · Utskrivet '+new Date().toLocaleDateString('sv-SE')+'</p>';
+  html+='<script>window.print();<\/script></body></html>';
+  w.document.write(html);
+  w.document.close();
+}
+function printAll(){
+  if(!missions.length){alert('Inga uppdrag att skriva ut.');return;}
+  missions.forEach(function(m){printMission(m.id);});
+}
+function renderMissions(){
+  var el=document.getElementById('mission-list');
+  var em=document.getElementById('mission-empty');
+  if(!missions.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  el.innerHTML=missions.map(function(m){
+    var mps=projects.filter(function(p){return m.projectIds.includes(p.id);});
+    var phtml=mps.map(function(p){return '<div class="mp"><div style="width:22px;height:22px;border-radius:50%;background:'+(p.progress===100?'var(--gp)':'var(--c)')+';display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:'+(p.progress===100?'#1A4D2E':'var(--ink3)')+';flex-shrink:0">'+p.progress+'%</div><div>'+(p.progress===100?'<s>':'')+p.name+(p.progress===100?'</s>':'')+'</div></div>';}).join('');
+    var ehtml=m.extras.map(function(e,i){return '<div class="ci'+(e.done?' done':'')+'" onclick="toggleMissionExtra('+m.id+','+i+')"><div class="cbox">'+(e.done?chk():'')+'</div><div class="ct2">'+e.text+'</div></div>';}).join('');
+    return '<div class="mc"><div class="mc-head"><div style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="mc-title">'+m.name+'</div>'+(m.date?'<div class="mc-date">'+m.date+'</div>':'')+(m.people?'<div style="font-size:.77rem;opacity:.7;margin-top:1px">'+m.people+'</div>':'')+'</div><span style="font-size:.8rem;opacity:.7">'+mps.length+' projekt</span></div></div>'+
+    '<div class="mc-body">'+
+    (mps.length?'<div style="font-size:.72rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">PROJEKT</div>'+phtml:'<div style="font-size:.84rem;color:var(--ink3)">Inga projekt kopplade</div>')+
+    (m.extras.length?'<div style="font-size:.72rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 8px">GLÖM INTE</div><div class="cl">'+ehtml+'</div>':'')+
+    '<div class="acts" style="margin-top:14px;margin-bottom:0">'+
+    '<button class="btn pri" onclick="printMission('+m.id+')">Skriv ut</button>'+
+    '<button class="btn ylw" onclick="editMission('+m.id+')">Redigera</button>'+
+    '<button class="btn" onclick="shareMission('+m.id+')">Kopiera text</button>'+
+    '<button class="btn red" onclick="delMission('+m.id+')">Ta bort</button>'+
+    '</div></div></div>';
+  }).join('');
+}
+
+var editingMissionId = null;
+
+function editMission(mid) {
+  editingMissionId = mid;
+  var m = missions.find(function(x){return x.id===mid;});
+  if(!m) return;
+
+  // Fyll i formuläret med befintlig data
+  document.getElementById('mission-name').value = m.name;
+  document.getElementById('mission-date').value = m.date || '';
+  document.getElementById('mission-people').value = m.people || '';
+  document.getElementById('mission-extras').value = m.extras.map(function(e){return e.text;}).join('\n');
+
+  // Uppdatera modal-rubriken
+  document.querySelector('#ov-mission .mh-t').textContent = 'Redigera uppdrag';
+  document.getElementById('btn-save-mission').textContent = 'Spara ändringar';
+
+  // Bygg projekt-väljaren och förkryssa de som redan är med
+  buildMissionSel();
+  setTimeout(function(){
+    var checkboxes = document.querySelectorAll('input[name="mp"]');
+    checkboxes.forEach(function(cb){
+      cb.checked = m.projectIds.includes(parseInt(cb.value));
+    });
+  }, 50);
+
+  openModal('mission');
+}
+
+
+// ── TODOS ─────────────────────────────────────────
+document.getElementById('btn-save-todo').addEventListener('click',function(){
+  var txt=document.getElementById('todo-text').value.trim();
+  if(!txt)return;
+  todos.unshift({text:txt,prio:document.getElementById('todo-prio').value,done:false});
+  save('todos',todos);
+  renderTodos();
+  closeModal('todo');
+  document.getElementById('todo-text').value='';
+});
+function toggleTodo(idx){todos[idx].done=!todos[idx].done;save('todos',todos);renderTodos();}
+var PLABEL={high:'Hög',med:'Medel',low:'Låg'};
+var PCLASS={high:'br',med:'ba',low:'bg'};
+function renderTodos(){
+  var el=document.getElementById('todo-list');
+  if(!todos.length){el.innerHTML='<div style="color:var(--ink3);font-size:.84rem">Inga uppgifter ännu</div>';updateKPIs();return;}
+  el.innerHTML=todos.map(function(t,i){return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+i+')"><div class="cbox">'+(t.done?chk():'')+'</div><div class="ct2">'+t.text+'</div><span class="badge '+PCLASS[t.prio]+' cprio">'+PLABEL[t.prio]+'</span></div>';}).join('');
+  updateKPIs();
+}
+
+// ── PURCHASES ─────────────────────────────────────
+document.getElementById('btn-save-purchase').addEventListener('click',function(){
+  var txt=document.getElementById('pur-text').value.trim();
+  if(!txt)return;
+  purchases.unshift({text:txt,price:parseInt(document.getElementById('pur-price').value)||0,where:document.getElementById('pur-where').value,done:false});
+  save('purchases',purchases);
+  renderPurchases();
+  closeModal('purchase');
+  document.getElementById('pur-text').value='';
+  document.getElementById('pur-price').value='';
+  document.getElementById('pur-where').value='';
+});
+function togglePurchase(idx){purchases[idx].done=!purchases[idx].done;save('purchases',purchases);renderPurchases();}
+function renderPurchases(){
+  var el=document.getElementById('purchase-list');
+  if(!purchases.length){el.innerHTML='<div style="color:var(--ink3);font-size:.84rem">Inga inköp ännu</div>';return;}
+  el.innerHTML=purchases.map(function(p,i){return '<div class="ci'+(p.done?' done':'')+'" onclick="togglePurchase('+i+')"><div class="cbox">'+(p.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+p.text+'</div>'+(p.where?'<div style="font-size:.75rem;color:var(--ink3)">'+p.where+'</div>':'')+'</div>'+(p.price?'<span style="font-size:.81rem;color:var(--ink3)">'+p.price.toLocaleString('sv')+' kr</span>':'')+'</div>';}).join('');
+}
+
+// ── KPIs ──────────────────────────────────────────
+function updateKPIs(){
+  var totExp=expenses.reduce(function(s,e){return s+e.amount;},0);
+  var actProj=projects.filter(function(p){return p.progress<100;}).length;
+  var openTodos=todos.filter(function(t){return !t.done;}).length;
+  var totInc=guests.reduce(function(s,g){return s+g.amount;},0);
+  document.getElementById('kpi-row').innerHTML=
+    '<div class="kpi" onclick="showSec(\'ekonomi\')"><div class="kl">Loggade kostnader</div><div class="kv">'+totExp.toLocaleString('sv')+' kr</div><div class="ks">'+expenses.length+' poster</div></div>'+
+    '<div class="kpi" onclick="showSec(\'uthyrning\')"><div class="kl">Uthyrningsintäkt</div><div class="kv">'+totInc.toLocaleString('sv')+' kr</div><div class="ks">'+guests.length+' bokningar</div></div>'+
+    '<div class="kpi" onclick="showSec(\'projekt\')"><div class="kl">Aktiva projekt</div><div class="kv">'+actProj+'</div><div class="ks">'+projects.length+' totalt</div></div>'+
+    '<div class="kpi" onclick="showSec(\'listor\')"><div class="kl">Öppna uppgifter</div><div class="kv">'+openTodos+'</div><div class="ks">'+todos.length+' totalt</div></div>';
+}
+
+// ── GUIDE – klistra in från Claude ────────────────
+var currentGuideProjectId = null;
+
+function openGuide(pid) {
+  currentGuideProjectId = pid;
+  var p = projects.find(function(x){return x.id===pid;});
+  if(!p) return;
+  document.getElementById('guide-modal-title').textContent = p.name;
+  document.getElementById('guide-modal-sub').textContent = p.cat + (p.desc ? ' – ' + p.desc.slice(0,70) : '');
+  document.getElementById('guide-paste').value = p.guide || '';
+  document.getElementById('guide-notes').value = p.guideNotes || '';
+  openModal('guide');
+}
+
+document.getElementById('btn-save-guide').addEventListener('click', function() {
+  var p = projects.find(function(x){return x.id===currentGuideProjectId;});
+  if(!p) return;
+  var guide = document.getElementById('guide-paste').value.trim();
+  var notes = document.getElementById('guide-notes').value.trim();
+  if(!guide && !notes) { alert('Klistra in en guide eller skriv egna anteckningar först.'); return; }
+  p.guide = guide;
+  p.guideNotes = notes;
+  save('projects', projects);
+  renderProjects();
+  closeModal('guide');
+});
+
+function clearGuide(pid) {
+  var p = projects.find(function(x){return x.id===pid;});
+  if(!p || !confirm('Ta bort guiden?')) return;
+  delete p.guide;
+  delete p.guideNotes;
+  save('projects', projects);
+  renderProjects();
+}
+
+// ── INIT ──────────────────────────────────────────
+var td=new Date().toLocaleDateString('sv-SE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('today').textContent=td.charAt(0).toUpperCase()+td.slice(1);
+renderExpenses();
+renderGuests();
+renderProjects();
+renderMissions();
+renderTodos();
+renderPurchases();
+</script>
+</body>
+</html>
