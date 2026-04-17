@@ -202,6 +202,17 @@ tr:hover td{background:#f9f9f6}
 @media print{header,nav,.acts,.btn,.hbtns,.ov{display:none!important}body{background:#fff}}
 
 .info{background:var(--gp);border:1px solid #b8ddc2;border-radius:var(--rs);padding:12px 16px;font-size:.84rem;color:#1A4D2E;margin-bottom:14px;line-height:1.55}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day-header{text-align:center;font-size:.72rem;color:var(--ink3);padding:4px 0;font-weight:500}
+.cal-day{min-height:52px;border-radius:4px;padding:4px;font-size:.78rem;background:var(--c);position:relative}
+.cal-day.today{border:1.5px solid var(--g)}
+.cal-day.other-month{opacity:.35}
+.cal-day-num{font-size:.75rem;color:var(--ink3);margin-bottom:2px}
+.cal-event{border-radius:3px;padding:1px 4px;font-size:.68rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-event.guest{background:#EAF3DE;color:#1A4D2E}
+.cal-event.airbnb{background:#F0EBF9;color:#534AB7}
+.cal-event.own{background:#E8F0F9;color:#185FA5}
+.cal-event.proj{background:#FDF3E0;color:#854F0B}
 .img-card{border-radius:var(--rs);overflow:hidden;cursor:pointer;position:relative;background:var(--s);aspect-ratio:4/3}
 .img-card img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
 .img-card:hover img{transform:scale(1.04)}
@@ -340,6 +351,33 @@ tr:hover td{background:#f9f9f6}
     <div class="kpi"><div class="kl">Intäkt 2025</div><div class="kv" id="income">0 kr</div></div>
     <div class="kpi"><div class="kl">Antal gäster</div><div class="kv" id="guestcount">0</div></div>
   </div>
+
+  <!-- KALENDER -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="ch">
+      <div class="ct">Kalender</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" style="font-size:.78rem;padding:4px 10px" id="btn-prev-month">‹</button>
+        <span id="cal-month-label" style="font-size:.88rem;font-weight:500;align-self:center;min-width:120px;text-align:center"></span>
+        <button class="btn" style="font-size:.78rem;padding:4px 10px" id="btn-next-month">›</button>
+      </div>
+      <button class="btn ylw" style="font-size:.78rem;padding:4px 10px" onclick="openModal('cal-settings')">Koppla kalender</button>
+    </div>
+    <div class="cb" style="padding:12px">
+      <div id="calendar-grid"></div>
+      <!-- Legend -->
+      <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--ink3)"><div style="width:10px;height:10px;border-radius:2px;background:#E8F0F9"></div>Ert besök</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--ink3)"><div style="width:10px;height:10px;border-radius:2px;background:#EAF3DE"></div>Gäster</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--ink3)"><div style="width:10px;height:10px;border-radius:2px;background:#F0EBF9"></div>Airbnb</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--ink3)"><div style="width:10px;height:10px;border-radius:2px;background:#FDF3E0"></div>Projekt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Airbnb iCal-status -->
+  <div id="airbnb-cal-status" style="display:none" class="info"></div>
+
   <div class="card">
     <div class="ch"><div class="ct">Gästregister</div></div>
     <div style="padding:0"><table><thead><tr><th>Gäst</th><th>Incheckning</th><th>Utcheckning</th><th>Plattform</th><th>Belopp</th><th>Kontakt</th></tr></thead><tbody id="guest-body"></tbody></table></div>
@@ -490,6 +528,25 @@ tr:hover td{background:#f9f9f6}
 <!-- ===== MODALER ===== -->
 
 <!-- Drive config -->
+<!-- Kalender-inställningar -->
+<div class="ov" id="ov-cal-settings">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">Koppla kalender</div><button class="mx" data-close="cal-settings">×</button></div>
+    <div class="mb">
+      <div class="info" style="margin-bottom:14px">Koppla Airbnb-kalendern så visas alla bokningar direkt i appen. Google Kalender visar era egna besök.</div>
+      <div class="fr">
+        <div class="fl">Airbnb iCal-länk</div>
+        <input class="fi" type="url" id="airbnb-ical-url" placeholder="https://www.airbnb.com/calendar/ical/...ics">
+        <div style="font-size:.77rem;color:var(--ink3);margin-top:4px">Airbnb → Din annons → Kalender → Exportera kalender → Kopiera länk</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn" data-close="cal-settings">Avbryt</button>
+      <button class="btn pri" id="btn-save-cal-settings">Spara & hämta</button>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="ov-drive">
   <div class="modal">
     <div class="mh"><div class="mh-t">Konfigurera Google Drive-länkar</div><button class="mx" data-close="drive">×</button></div>
@@ -850,6 +907,7 @@ var DRIVE_LABELS={ekonomi:'Ekonomi-mappen',budget:'Budget_Backerum.xlsx',uthyrni
 function renderAll(){
   renderExpenses();renderGuests();renderProjects();
   renderMissions();renderTodos();renderPurchases();updateKPIs();
+  renderCalendar();
 }
 
 // ── CLAUDE PROMPTS ────────────────────────────────
@@ -1780,6 +1838,145 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight') document.getElementById('lb-next').click();
   if(e.key==='Escape') lb.style.display='none';
 });
+
+// ── KALENDER ──────────────────────────────────────
+var calYear = new Date().getFullYear();
+var calMonth = new Date().getMonth();
+var airbnbEvents = load('airbnbEvents', []);
+var calSettings = load('calSettings', {airbnbUrl:'', gcalId:'', ownName:'Backerum'});
+
+var MONTHS_SV = ['Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'];
+var DAYS_SV = ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
+
+document.getElementById('btn-prev-month').addEventListener('click',function(){
+  calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar();
+});
+document.getElementById('btn-next-month').addEventListener('click',function(){
+  calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar();
+});
+
+document.getElementById('btn-save-cal-settings').addEventListener('click',function(){
+  calSettings.airbnbUrl = document.getElementById('airbnb-ical-url').value.trim();
+  saveLocal('calSettings', calSettings);
+  closeModal('cal-settings');
+  if(calSettings.airbnbUrl) fetchAirbnbCal();
+  else renderCalendar();
+});
+
+function fetchAirbnbCal(){
+  if(!calSettings.airbnbUrl) return;
+  var status = document.getElementById('airbnb-cal-status');
+  status.style.display='block';
+  status.textContent='Hämtar Airbnb-kalender...';
+  // Använd en CORS-proxy för att hämta iCal
+  var proxy = 'https://api.allorigins.win/raw?url=';
+  fetch(proxy + encodeURIComponent(calSettings.airbnbUrl))
+    .then(function(r){return r.text();})
+    .then(function(ical){
+      airbnbEvents = parseICal(ical);
+      saveLocal('airbnbEvents', airbnbEvents);
+      status.textContent = 'Airbnb-kalender hämtad – '+airbnbEvents.length+' bokningar inlästa';
+      setTimeout(function(){status.style.display='none';}, 4000);
+      renderCalendar();
+    })
+    .catch(function(){
+      status.textContent = 'Kunde inte hämta Airbnb-kalender. Kontrollera länken.';
+      status.style.color = '#C0392B';
+    });
+}
+
+function parseICal(text){
+  var events = [];
+  var lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  var ev = null;
+  lines.forEach(function(line){
+    if(line==='BEGIN:VEVENT'){ev={};}
+    else if(line==='END:VEVENT'&&ev){
+      if(ev.start&&ev.end) events.push(ev);
+      ev=null;
+    } else if(ev){
+      if(line.startsWith('DTSTART')){ev.start=parseICalDate(line.split(':')[1]);}
+      else if(line.startsWith('DTEND')){ev.end=parseICalDate(line.split(':')[1]);}
+      else if(line.startsWith('SUMMARY')){ev.title=line.split(':').slice(1).join(':').trim();}
+    }
+  });
+  return events;
+}
+
+function parseICalDate(str){
+  str = str.replace(/T.*/,'').trim();
+  return str.slice(0,4)+'-'+str.slice(4,6)+'-'+str.slice(6,8);
+}
+
+function getCalendarEvents(){
+  var events = [];
+  // Gäster från gästregistret
+  guests.forEach(function(g){
+    if(g.in&&g.out) events.push({start:g.in, end:g.out, title:g.name+(g.platform?' ('+g.platform+')':''), type:'guest'});
+  });
+  // Airbnb från iCal
+  airbnbEvents.forEach(function(e){
+    events.push({start:e.start, end:e.end, title:'Airbnb: '+(e.title||'Bokning'), type:'airbnb'});
+  });
+  // Uppdrag/projekt som har datum
+  missions.filter(function(m){return m.date&&!m.completed;}).forEach(function(m){
+    var d = m.date.split('–')[0].trim();
+    events.push({start:d, end:d, title:m.name, type:'proj'});
+  });
+  return events;
+}
+
+function renderCalendar(){
+  var label = document.getElementById('cal-month-label');
+  if(!label) return;
+  label.textContent = MONTHS_SV[calMonth] + ' ' + calYear;
+  var grid = document.getElementById('calendar-grid');
+  if(!grid) return;
+
+  var events = getCalendarEvents();
+  var firstDay = new Date(calYear, calMonth, 1);
+  var lastDay = new Date(calYear, calMonth+1, 0);
+  var startDow = (firstDay.getDay()+6)%7; // Måndag=0
+  var today = new Date().toISOString().slice(0,10);
+
+  var html = '<div class="cal-grid">';
+  DAYS_SV.forEach(function(d){html+='<div class="cal-day-header">'+d+'</div>';});
+
+  // Fyll ut från föregående månad
+  for(var i=0;i<startDow;i++){
+    var prevDate = new Date(calYear,calMonth,1-startDow+i);
+    html+='<div class="cal-day other-month"><div class="cal-day-num">'+prevDate.getDate()+'</div></div>';
+  }
+
+  // Dagar i månaden
+  for(var d=1;d<=lastDay.getDate();d++){
+    var dateStr = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var isToday = dateStr===today;
+    var dayEvents = events.filter(function(e){
+      return e.start<=dateStr && e.end>dateStr || e.start===dateStr;
+    });
+    html+='<div class="cal-day'+(isToday?' today':'')+'">'+
+      '<div class="cal-day-num"'+(isToday?' style="color:var(--g);font-weight:500"':'')+'>'+d+'</div>';
+    dayEvents.slice(0,3).forEach(function(e){
+      html+='<div class="cal-event '+e.type+'" title="'+e.title+'">'+e.title+'</div>';
+    });
+    if(dayEvents.length>3) html+='<div style="font-size:.65rem;color:var(--ink3)">+' +(dayEvents.length-3)+' till</div>';
+    html+='</div>';
+  }
+
+  // Fyll ut till nästa månad
+  var remaining = (7 - (startDow+lastDay.getDate())%7)%7;
+  for(var j=1;j<=remaining;j++){
+    html+='<div class="cal-day other-month"><div class="cal-day-num">'+j+'</div></div>';
+  }
+  html+='</div>';
+  grid.innerHTML=html;
+}
+
+// Läs in sparad Airbnb-URL vid start
+if(calSettings.airbnbUrl){
+  document.getElementById('airbnb-ical-url').value=calSettings.airbnbUrl;
+}
 
 // ── INIT ──────────────────────────────────────────
 var td=new Date().toLocaleDateString('sv-SE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
