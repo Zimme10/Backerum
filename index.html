@@ -957,7 +957,19 @@ document.getElementById('btn-do-import').addEventListener('click',function(){
     var json=raw.startsWith(prefix)?raw.slice(prefix.length):raw;
     var d=JSON.parse(json);
     if(!d.name)throw new Error('Saknar namn');
-    projects.unshift({id:Date.now(),name:d.name,cat:d.cat||'Utomhus',budget:d.budget||0,desc:d.desc||'',todos:(d.todos||[]).map(function(t){return{text:t,done:false};}),items:(d.items||[]).map(function(t){return{text:t,done:false};}),progress:0,created:new Date().toISOString().slice(0,10)});
+    projects.unshift({
+      id:Date.now(),
+      name:d.name,
+      cat:d.cat||'Utomhus',
+      budget:d.budget||0,
+      desc:d.desc||'',
+      todos:(d.todos||[]).map(function(t){return{text:t,done:false};}),
+      items:(d.items||[]).map(function(t){return{text:t,done:false};}),
+      guide:d.guide||'',
+      guideNotes:d.guideNotes||'',
+      progress:0,
+      created:new Date().toISOString().slice(0,10)
+    });
     save('projects',projects);
     renderProjects();
     closeModal('import');
