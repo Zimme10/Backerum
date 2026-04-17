@@ -168,8 +168,14 @@ tr:hover td{background:#f9f9f6}
     <button class="hbtn" id="btn-new-proj">+ Nytt projekt</button>
     <button class="hbtn" id="btn-new-mission">+ Nytt uppdrag</button>
     <button class="hbtn" id="btn-print">Skriv ut</button>
+    <button class="hbtn" id="btn-signin" onclick="signIn()">Logga in med Google</button>
   </div>
 </header>
+
+<div id="drive-sync-bar" style="background:#FDF3E0;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;font-size:.82rem;border-bottom:1px solid #e8c98a">
+  <span class="sync-label" style="color:#5C3D2E">Inte ansluten till Drive – klicka "Logga in med Google" för att dela data med din tjej</span>
+  <span id="sync-status" style="font-size:.78rem;font-weight:500"></span>
+</div>
 
 <nav>
   <div class="ntab on" data-sec="hem"><span class="dot" style="background:#1A4D2E"></span>Översikt</div>
@@ -565,9 +571,18 @@ tr:hover td{background:#f9f9f6}
 </div>
 
 <script>
-// ── STORAGE ──────────────────────────────────────
+// ── GOOGLE DRIVE SYNC ─────────────────────────────
+var CLIENT_ID = '449663044867-7oaqsoplaf9rk134ivbks2hvm8lma3mr.apps.googleusercontent.com';
+var FOLDER_ID = '1F7iVW8UsTIeC9knrzGmhj_R7KdHFX_sN';
+var SCOPE = 'https://www.googleapis.com/auth/drive.file';
+var FILE_NAME = 'backerum-data.json';
+var driveFileId = null;
+var tokenClient = null;
+var isSignedIn = false;
+
+// ── LOCAL FALLBACK ────────────────────────────────
 function load(k,d){try{var v=localStorage.getItem('br_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
-function save(k,v){localStorage.setItem('br_'+k,JSON.stringify(v));}
+function saveLocal(k,v){localStorage.setItem('br_'+k,JSON.stringify(v));}
 
 var driveLinks=load('drive',{});
 var expenses=load('expenses',[]);
@@ -577,9 +592,186 @@ var missions=load('missions',[]);
 var todos=load('todos',[]);
 var purchases=load('purchases',[]);
 
-// ── DRIVE CONFIG ──────────────────────────────────
+// ── SAVE – sparar lokalt OCH till Drive ───────────
+function save(k,v){
+  saveLocal(k,v);
+  scheduleDriveSync();
+}
+
+var syncTimer=null;
+function scheduleDriveSync(){
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(function(){
+    if(isSignedIn) syncToDrive();
+  },1500);
+}
+
+// ── BYGG DATA-OBJEKT ──────────────────────────────
+function buildData(){
+  return {
+    version:1,
+    updated:new Date().toISOString(),
+    driveLinks:driveLinks,
+    expenses:expenses,
+    guests:guests,
+    projects:projects,
+    missions:missions,
+    todos:todos,
+    purchases:purchases
+  };
+}
+
+function applyData(d){
+  if(!d||d.version!==1)return;
+  driveLinks=d.driveLinks||{};
+  expenses=d.expenses||[];
+  guests=d.guests||[];
+  projects=d.projects||[];
+  missions=d.missions||[];
+  todos=d.todos||[];
+  purchases=d.purchases||[];
+  // Spara lokalt också
+  ['driveLinks','expenses','guests','projects','missions','todos','purchases'].forEach(function(k){
+    saveLocal(k,eval(k));
+  });
+}
+
+// ── DRIVE API CALLS ───────────────────────────────
+function getToken(){return gapi.client.getToken()&&gapi.client.getToken().access_token;}
+
+function syncToDrive(){
+  if(!isSignedIn||!getToken())return;
+  var data=JSON.stringify(buildData(),null,2);
+  if(driveFileId){
+    // Uppdatera befintlig fil
+    fetch('https://www.googleapis.com/upload/drive/v3/files/'+driveFileId+'?uploadType=media',{
+      method:'PATCH',
+      headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+      body:data
+    }).then(function(){showSyncStatus('Synkad med Drive');}).catch(function(){showSyncStatus('Sync misslyckades','err');});
+  } else {
+    // Skapa ny fil
+    fetch('https://www.googleapis.com/drive/v3/files',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+      body:JSON.stringify({name:FILE_NAME,parents:[FOLDER_ID],mimeType:'application/json'})
+    }).then(function(r){return r.json();})
+    .then(function(f){
+      driveFileId=f.id;
+      saveLocal('driveFileId',driveFileId);
+      // Ladda upp innehållet
+      return fetch('https://www.googleapis.com/upload/drive/v3/files/'+driveFileId+'?uploadType=media',{
+        method:'PATCH',
+        headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+        body:data
+      });
+    }).then(function(){showSyncStatus('Sparad i Drive');}).catch(function(){showSyncStatus('Kunde inte spara','err');});
+  }
+}
+
+function loadFromDrive(){
+  if(!isSignedIn||!getToken())return;
+  setStatus('Söker efter data i Drive...');
+  // Hitta befintlig fil
+  var q='name="'+FILE_NAME+'" and "'+FOLDER_ID+'" in parents and trashed=false';
+  fetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name,modifiedTime)',{
+    headers:{'Authorization':'Bearer '+getToken()}
+  }).then(function(r){return r.json();})
+  .then(function(res){
+    if(res.files&&res.files.length>0){
+      driveFileId=res.files[0].id;
+      saveLocal('driveFileId',driveFileId);
+      // Hämta innehållet
+      return fetch('https://www.googleapis.com/drive/v3/files/'+driveFileId+'?alt=media',{
+        headers:{'Authorization':'Bearer '+getToken()}
+      }).then(function(r){return r.json();});
+    }else{
+      setStatus('');
+      showSyncStatus('Ingen tidigare data hittad – startar färskt');
+      return null;
+    }
+  }).then(function(data){
+    if(data){
+      applyData(data);
+      renderAll();
+      setStatus('');
+      showSyncStatus('Data inläst från Drive');
+    }
+  }).catch(function(){
+    setStatus('');
+    showSyncStatus('Kunde inte läsa från Drive','err');
+  });
+}
+
+function showSyncStatus(msg,type){
+  var el=document.getElementById('sync-status');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=type==='err'?'#C0392B':'#2D7A4F';
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.textContent='';},4000);
+}
+
+function setStatus(msg){
+  var el=document.getElementById('sync-status');
+  if(el)el.textContent=msg;
+}
+
+// ── GOOGLE IDENTITY ───────────────────────────────
+function initGoogleAuth(){
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID,
+    scope:SCOPE,
+    callback:function(resp){
+      if(resp.error){showSyncStatus('Inloggning misslyckades','err');return;}
+      isSignedIn=true;
+      updateSignInUI(true);
+      loadFromDrive();
+    }
+  });
+  // Försök stilla-inloggning om vi har ett sparat token-hint
+  gapi.load('client',function(){
+    gapi.client.init({}).then(function(){
+      // Kolla om det finns en sparad session
+      var hint=localStorage.getItem('br_gaccount');
+      if(hint){
+        tokenClient.requestAccessToken({prompt:'none',login_hint:hint});
+      }
+    });
+  });
+}
+
+function signIn(){
+  tokenClient.requestAccessToken({prompt:''});
+}
+
+function signOut(){
+  var token=gapi.client.getToken();
+  if(token){google.accounts.oauth2.revoke(token.access_token);}
+  gapi.client.setToken('');
+  isSignedIn=false;
+  updateSignInUI(false);
+  showSyncStatus('Utloggad');
+}
+
+function updateSignInUI(loggedIn){
+  var btn=document.getElementById('btn-signin');
+  var status=document.getElementById('drive-sync-bar');
+  if(btn){btn.textContent=loggedIn?'Logga ut från Drive':'Logga in med Google';}
+  if(status){status.style.background=loggedIn?'#EAF3DE':'#FDF3E0';
+    status.querySelector('.sync-label').textContent=loggedIn?'Ansluten till Drive – data delas med din tjej':'Inte ansluten till Drive';}
+}
+
+
+// ── DRIVE CONFIG (mapplänkar) ─────────────────────
 var DRIVE_KEYS=['ekonomi','budget','uthyrning','projekt','bilder','bildboken','dokument','kopehandlingar','ritningar','tillstand'];
 var DRIVE_LABELS={ekonomi:'Ekonomi-mappen',budget:'Budget_Backerum.xlsx',uthyrning:'Uthyrning-mappen',projekt:'Projekt-mappen',bilder:'Bilder-mappen',bildboken:'Bildboken-mappen',dokument:'Dokument-mappen',kopehandlingar:'Köpehandlingar',ritningar:'Ritningar',tillstand:'Tillstånd'};
+
+// ── RENDER ALL ────────────────────────────────────
+function renderAll(){
+  renderExpenses();renderGuests();renderProjects();
+  renderMissions();renderTodos();renderPurchases();updateKPIs();
+}
 
 // ── CLAUDE PROMPTS ────────────────────────────────
 var PROMPTS={
@@ -1126,12 +1318,20 @@ function clearGuide(pid) {
 // ── INIT ──────────────────────────────────────────
 var td=new Date().toLocaleDateString('sv-SE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('today').textContent=td.charAt(0).toUpperCase()+td.slice(1);
-renderExpenses();
-renderGuests();
-renderProjects();
-renderMissions();
-renderTodos();
-renderPurchases();
+renderAll();
+
+// Ladda Google-bibliotek
+var gapiScript=document.createElement('script');
+gapiScript.src='https://apis.google.com/js/api.js';
+gapiScript.onload=function(){
+  var gisScript=document.createElement('script');
+  gisScript.src='https://accounts.google.com/gsi/client';
+  gisScript.onload=function(){
+    initGoogleAuth();
+  };
+  document.head.appendChild(gisScript);
+};
+document.head.appendChild(gapiScript);
 </script>
 </body>
 </html>
