@@ -357,9 +357,18 @@ tr:hover td{background:#f9f9f6}
   </div>
   <div class="info">Beskriv ett projekt i Claude-chatten – ladda gärna upp bilder. Be sedan Claude: <em>"ge mig importkoden"</em>. Kopiera koden och klistra in via knappen ovan.</div>
   <div id="proj-list"></div>
-  <div class="empty-state" id="proj-empty">
-    <p>Inga projekt ännu. Skapa ett nytt eller importera från Claude.</p>
+  <div class="empty-state" id="proj-empty" style="display:none">
+    <p>Inga aktiva projekt. Skapa ett nytt eller importera från Claude.</p>
     <button class="btn pri" data-modal="proj">+ Skapa första projekt</button>
+  </div>
+  <!-- Klara projekt -->
+  <div id="proj-done-section" style="display:none;margin-top:24px">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px" onclick="toggleDoneProjects()">
+      <div style="flex:1;height:1px;background:var(--s)"></div>
+      <span id="proj-done-label" style="font-size:.8rem;color:var(--ink3);white-space:nowrap">Visa klara projekt</span>
+      <div style="flex:1;height:1px;background:var(--s)"></div>
+    </div>
+    <div id="proj-done-list" style="display:none"></div>
   </div>
 </div>
 
@@ -373,8 +382,17 @@ tr:hover td{background:#f9f9f6}
   </div>
   <div id="mission-list"></div>
   <div class="empty-state" id="mission-empty">
-    <p>Inga uppdrag ännu. Samla 5–7 projekt till t.ex. en Valborg-helg.</p>
+    <p>Inga aktiva uppdrag. Samla 5–7 projekt till t.ex. en Valborg-helg.</p>
     <button class="btn pri" data-modal="mission">+ Skapa första uppdrag</button>
+  </div>
+  <!-- Genomförda uppdrag -->
+  <div id="mission-done-section" style="display:none;margin-top:24px">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px" onclick="toggleDoneMissions()">
+      <div style="flex:1;height:1px;background:var(--s)"></div>
+      <span id="mission-done-label" style="font-size:.8rem;color:var(--ink3);white-space:nowrap">Visa genomförda uppdrag</span>
+      <div style="flex:1;height:1px;background:var(--s)"></div>
+    </div>
+    <div id="mission-done-list" style="display:none"></div>
   </div>
 </div>
 
@@ -1042,6 +1060,114 @@ document.getElementById('btn-do-import').addEventListener('click',function(){
   }
 });
 
+function renderProjects(){
+  var el=document.getElementById('proj-list');
+  var em=document.getElementById('proj-empty');
+  var doneSection=document.getElementById('proj-done-section');
+  var doneList=document.getElementById('proj-done-list');
+  var doneLabel=document.getElementById('proj-done-label');
+
+  var active=projects.filter(function(p){return !p.completed;});
+  var done=projects.filter(function(p){return p.completed;});
+
+  if(!active.length){el.innerHTML='';em.style.display='block';}
+  else{em.style.display='none';}
+
+  if(done.length){
+    doneSection.style.display='block';
+    doneLabel.textContent='Visa klara projekt ('+done.length+')';
+  } else {
+    doneSection.style.display='none';
+  }
+
+  var catCol={Utomhus:'#3B6D11',Inomhus:'#185FA5',Trädgård:'#2D7A4F',Bryggan:'#0F6E56',Renovering:'#854F0B',Övrigt:'#5F5E5A'};
+
+  function renderProjCards(list, container, isArchive){
+    if(!list.length){container.innerHTML='';return;}
+    container.innerHTML=list.map(function(p){
+      var cc=catCol[p.cat]||'#5F5E5A';
+      var dt=p.todos.filter(function(t){return t.done;}).length;
+      var di=p.items.filter(function(t){return t.done;}).length;
+      var pct=p.progress;
+      var pcolor=pct===100?'#1A4D2E':pct>0?'#D48B2E':'#9e9e8e';
+
+      var thtml=p.todos.map(function(t,i){
+        return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',false)"><div class="cb2">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
+      }).join('');
+      var ihtml=p.items.map(function(t,i){
+        return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',true)"><div class="cb2 sq">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
+      }).join('');
+
+      var completedBanner = p.completed ? '<div style="background:#EAF3DE;padding:8px 16px;font-size:.8rem;color:#1A4D2E;display:flex;align-items:center;justify-content:space-between"><span>Klart '+p.completedDate+'</span><button class="btn" style="font-size:.75rem;padding:3px 10px" onclick="uncompleteProject('+p.id+')">Återaktivera</button></div>' : '';
+
+      return '<div class="pc" style="'+(p.completed?'opacity:.75':'')+'">'+
+        completedBanner+
+        '<div class="pc-top"><div class="pc-bar" style="background:'+(p.completed?'#1A4D2E':cc)+'"></div>'+
+        '<div class="pc-info">'+
+        '<div><div class="pc-name">'+p.name+'</div><div class="pc-meta" style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:'+cc+';display:inline-block"></span>'+p.cat+(p.budget?' &nbsp;·&nbsp; '+p.budget.toLocaleString('sv')+' kr':'')+'&nbsp;·&nbsp;'+p.created+'</div></div>'+
+        '<div class="pc-pct" style="color:'+(p.completed?'#1A4D2E':pcolor)+'">'+pct+'%</div></div></div>'+
+        '<div class="pc-prog"><div class="pc-fill" style="width:'+pct+'%;background:'+(p.completed?'#1A4D2E':'#4CAF7D')+'"></div></div>'+
+        '<div class="pc-body">'+
+        '<div class="pc-left">'+
+        (p.desc?'<div class="pc-desc">'+p.desc+'</div>':'')+
+        '<div class="pc-stats">'+
+        '<div class="pc-stat" style="background:var(--gp)"><div class="pc-stat-v" style="color:#1A4D2E">'+dt+'/'+p.todos.length+'</div><div class="pc-stat-l">Steg klara</div></div>'+
+        '<div class="pc-stat" style="background:var(--ap)"><div class="pc-stat-v" style="color:#854F0B">'+di+'/'+p.items.length+'</div><div class="pc-stat-l">Inköp klara</div></div>'+
+        '</div>'+
+        '<div class="pc-btns">'+
+        (!p.completed?'<button class="btn pri" style="font-size:.81rem" onclick="completeProject('+p.id+')">Markera som klar</button>':'')+ 
+        '<button class="btn" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
+        '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort</button>'+
+        '</div></div>'+
+        '<div class="pc-right">'+
+        (p.todos.length?'<div class="cl-head" style="color:#1A4D2E">ATT GÖRA</div>'+thtml:'')+ 
+        (p.items.length?'<div class="cl-head" style="color:#854F0B;margin-top:'+(p.todos.length?'10px':'0')+'">INKÖP</div>'+ihtml:'')+ 
+        (!p.todos.length&&!p.items.length?'<div style="color:var(--ink3);font-size:.84rem">Inga punkter</div>':'')+
+        '</div></div>'+
+        (p.guide?'<div style="border-top:1px solid var(--s);padding:14px 16px;background:#f9faf7"><div style="font-size:.72rem;font-weight:500;color:#1A4D2E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">GUIDE FRÅN CLAUDE</div><div style="font-size:.86rem;color:var(--ink2);line-height:1.65;white-space:pre-wrap">'+p.guide+'</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn" style="font-size:.78rem" onclick="openGuide('+p.id+')">Uppdatera guide</button><button class="btn red" style="font-size:.78rem" onclick="clearGuide('+p.id+')">Ta bort guide</button></div></div>':'')+ 
+        '</div>';
+    }).join('');
+  }
+
+  renderProjCards(active, el, false);
+  renderProjCards(done, doneList, true);
+  updateKPIs();
+}
+
+function completeProject(pid){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  p.completed=true;
+  p.completedDate=new Date().toLocaleDateString('sv-SE');
+  p.progress=100;
+  p.todos.forEach(function(t){t.done=true;});
+  p.items.forEach(function(t){t.done=true;});
+  save('projects',projects);
+  renderProjects();
+}
+
+function uncompleteProject(pid){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  p.completed=false;
+  delete p.completedDate;
+  save('projects',projects);
+  renderProjects();
+}
+
+function toggleDoneProjects(){
+  var list=document.getElementById('proj-done-list');
+  var label=document.getElementById('proj-done-label');
+  var done=projects.filter(function(p){return p.completed;});
+  if(list.style.display==='none'){
+    list.style.display='block';
+    label.textContent='Dölj klara projekt ('+done.length+')';
+  } else {
+    list.style.display='none';
+    label.textContent='Visa klara projekt ('+done.length+')';
+  }
+}
+
 function chk(){return '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';}
 
 function toggleProjItem(pid,idx,isBuy){
@@ -1251,23 +1377,137 @@ function printAll(){
 function renderMissions(){
   var el=document.getElementById('mission-list');
   var em=document.getElementById('mission-empty');
-  if(!missions.length){el.innerHTML='';em.style.display='block';return;}
-  em.style.display='none';
-  el.innerHTML=missions.map(function(m){
-    var mps=projects.filter(function(p){return m.projectIds.includes(p.id);});
-    var phtml=mps.map(function(p){return '<div class="mp"><div style="width:22px;height:22px;border-radius:50%;background:'+(p.progress===100?'var(--gp)':'var(--c)')+';display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:'+(p.progress===100?'#1A4D2E':'var(--ink3)')+';flex-shrink:0">'+p.progress+'%</div><div>'+(p.progress===100?'<s>':'')+p.name+(p.progress===100?'</s>':'')+'</div></div>';}).join('');
-    var ehtml=m.extras.map(function(e,i){return '<div class="ci'+(e.done?' done':'')+'" onclick="toggleMissionExtra('+m.id+','+i+')"><div class="cbox">'+(e.done?chk():'')+'</div><div class="ct2">'+e.text+'</div></div>';}).join('');
-    return '<div class="mc"><div class="mc-head"><div style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="mc-title">'+m.name+'</div>'+(m.date?'<div class="mc-date">'+m.date+'</div>':'')+(m.people?'<div style="font-size:.77rem;opacity:.7;margin-top:1px">'+m.people+'</div>':'')+'</div><span style="font-size:.8rem;opacity:.7">'+mps.length+' projekt</span></div></div>'+
-    '<div class="mc-body">'+
-    (mps.length?'<div style="font-size:.72rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">PROJEKT</div>'+phtml:'<div style="font-size:.84rem;color:var(--ink3)">Inga projekt kopplade</div>')+
-    (m.extras.length?'<div style="font-size:.72rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 8px">GLÖM INTE</div><div class="cl">'+ehtml+'</div>':'')+
-    '<div class="acts" style="margin-top:14px;margin-bottom:0">'+
-    '<button class="btn pri" onclick="printMission('+m.id+')">Skriv ut</button>'+
-    '<button class="btn ylw" onclick="editMission('+m.id+')">Redigera</button>'+
-    '<button class="btn" onclick="shareMission('+m.id+')">Kopiera text</button>'+
-    '<button class="btn red" onclick="delMission('+m.id+')">Ta bort</button>'+
-    '</div></div></div>';
-  }).join('');
+  var doneSection=document.getElementById('mission-done-section');
+  var doneList=document.getElementById('mission-done-list');
+  var doneLabel=document.getElementById('mission-done-label');
+
+  var active=missions.filter(function(m){return !m.completed;});
+  var done=missions.filter(function(m){return m.completed;});
+
+  if(!active.length){el.innerHTML='';em.style.display='block';}
+  else{em.style.display='none';}
+
+  if(done.length){doneSection.style.display='block';doneLabel.textContent='Visa genomförda uppdrag ('+done.length+')';}
+  else{doneSection.style.display='none';}
+
+  function renderMissionCards(list, container){
+    if(!list.length){container.innerHTML='';return;}
+    container.innerHTML=list.map(function(m){
+      var mps=projects.filter(function(p){return m.projectIds.includes(p.id);});
+      var doneProjs=mps.filter(function(p){return p.completed||p.progress===100;}).length;
+      var totalProjs=mps.length;
+      var missionPct=totalProjs?Math.round(doneProjs/totalProjs*100):0;
+
+      var phtml=mps.map(function(p){
+        var isDone=p.completed||p.progress===100;
+        return '<div class="mp" style="'+(isDone?'opacity:.6':'')+'">'+
+          '<div style="width:22px;height:22px;border-radius:50%;background:'+(isDone?'var(--gp)':'var(--c)')+';display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:'+(isDone?'#1A4D2E':'var(--ink3)')+';flex-shrink:0">'+(isDone?'✓':p.progress+'%')+'</div>'+
+          '<div style="flex:1'+(isDone?';text-decoration:line-through;color:var(--ink3)':'')+'">'+p.name+'</div>'+
+          (!m.completed?'<button class="btn" style="font-size:.72rem;padding:2px 8px" onclick="moveProjToMission('+p.id+','+m.id+')">Flytt →</button>':'')+ 
+          '</div>';
+      }).join('');
+
+      var ehtml=m.extras.map(function(e,i){return '<div class="ci'+(e.done?' done':'')+'" onclick="toggleMissionExtra('+m.id+','+i+')"><div class="cbox">'+(e.done?chk():'')+'</div><div class="ct2">'+e.text+'</div></div>';}).join('');
+
+      var completedBanner=m.completed?'<div style="background:#EAF3DE;padding:8px 16px;font-size:.8rem;color:#1A4D2E;display:flex;align-items:center;justify-content:space-between"><span>Genomfört '+m.completedDate+'</span><button class="btn" style="font-size:.75rem;padding:3px 10px" onclick="uncompleteMission('+m.id+')">Återaktivera</button></div>':'';
+
+      return '<div class="mc">'+completedBanner+
+        '<div class="mc-head"><div style="display:flex;align-items:flex-start;justify-content:space-between">'+
+        '<div><div class="mc-title">'+m.name+'</div>'+(m.date?'<div class="mc-date">'+m.date+'</div>':'')+(m.people?'<div style="font-size:.77rem;opacity:.7;margin-top:1px">'+m.people+'</div>':'')+'</div>'+
+        '<div style="text-align:right"><div style="font-size:1.1rem;font-weight:500;color:'+(missionPct===100?'#EAF3DE':'white')+'">'+missionPct+'%</div><div style="font-size:.72rem;opacity:.7">'+doneProjs+'/'+totalProjs+' projekt</div></div>'+
+        '</div></div>'+
+        '<div class="mc-body">'+
+        (mps.length?'<div style="height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-bottom:12px"><div style="height:100%;width:'+missionPct+'%;background:white;border-radius:2px;transition:width .3s"></div></div>':'')+ 
+        (mps.length?'<div style="font-size:.72rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">PROJEKT</div>'+phtml:'<div style="font-size:.84rem;color:var(--ink3)">Inga projekt kopplade</div>')+
+        (m.extras.length?'<div style="font-size:.72rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 8px">GLÖM INTE</div><div class="cl">'+ehtml+'</div>':'')+
+        '<div class="acts" style="margin-top:14px;margin-bottom:0">'+
+        (!m.completed?'<button class="btn pri" onclick="completeMission('+m.id+')">Markera genomfört</button>':'')+
+        '<button class="btn pri" onclick="printMission('+m.id+')">Skriv ut</button>'+
+        '<button class="btn ylw" onclick="editMission('+m.id+')">Redigera</button>'+
+        '<button class="btn" onclick="shareMission('+m.id+')">Kopiera text</button>'+
+        '<button class="btn red" onclick="delMission('+m.id+')">Ta bort</button>'+
+        '</div></div></div>';
+    }).join('');
+  }
+
+  renderMissionCards(active, el);
+  renderMissionCards(done, doneList);
+}
+
+function completeMission(mid){
+  var m=missions.find(function(x){return x.id===mid;});
+  if(!m)return;
+  var mps=projects.filter(function(p){return m.projectIds.includes(p.id);});
+  var unfinished=mps.filter(function(p){return !p.completed&&p.progress<100;});
+  if(unfinished.length){
+    var names=unfinished.map(function(p){return '• '+p.name;}).join('\n');
+    var choice=confirm('Det finns '+unfinished.length+' oklara projekt:\n'+names+'\n\nVill du flytta dem till ett annat uppdrag?\n\nOK = Flytta till nytt uppdrag\nAvbryt = Markera klart ändå');
+    if(choice){
+      openMoveProjectsModal(unfinished.map(function(p){return p.id;}), mid);
+      return;
+    }
+  }
+  m.completed=true;
+  m.completedDate=new Date().toLocaleDateString('sv-SE');
+  save('missions',missions);
+  renderMissions();
+}
+
+function uncompleteMission(mid){
+  var m=missions.find(function(x){return x.id===mid;});
+  if(!m)return;
+  m.completed=false;
+  delete m.completedDate;
+  save('missions',missions);
+  renderMissions();
+}
+
+function toggleDoneMissions(){
+  var list=document.getElementById('mission-done-list');
+  var label=document.getElementById('mission-done-label');
+  var done=missions.filter(function(m){return m.completed;});
+  if(list.style.display==='none'){list.style.display='block';label.textContent='Dölj genomförda uppdrag ('+done.length+')';}
+  else{list.style.display='none';label.textContent='Visa genomförda uppdrag ('+done.length+')';}
+}
+
+function moveProjToMission(pid, fromMid){
+  var missionNames=missions.filter(function(m){return m.id!==fromMid&&!m.completed;}).map(function(m){return m.name;});
+  if(!missionNames.length){alert('Inga andra aktiva uppdrag att flytta till. Skapa ett nytt uppdrag först.');return;}
+  var choice=prompt('Vilket uppdrag ska projektet flyttas till?\n\n'+missionNames.map(function(n,i){return (i+1)+'. '+n;}).join('\n')+'\n\nSkriv numret:');
+  if(!choice)return;
+  var idx=parseInt(choice)-1;
+  var targetMissions=missions.filter(function(m){return m.id!==fromMid&&!m.completed;});
+  if(idx<0||idx>=targetMissions.length){alert('Ogiltigt val.');return;}
+  var target=targetMissions[idx];
+  var from=missions.find(function(m){return m.id===fromMid;});
+  if(from){from.projectIds=from.projectIds.filter(function(id){return id!==pid;});}
+  if(target&&!target.projectIds.includes(pid)){target.projectIds.push(pid);}
+  save('missions',missions);
+  renderMissions();
+}
+
+function openMoveProjectsModal(pids, fromMid){
+  var missionNames=missions.filter(function(m){return m.id!==fromMid&&!m.completed;}).map(function(m){return m.name;});
+  var newName=prompt('Ange namn på nytt uppdrag (eller lämna tomt för att välja befintligt):\n\n'+
+    (missionNames.length?'Befintliga uppdrag:\n'+missionNames.map(function(n,i){return (i+1)+'. '+n;}).join('\n'):'Inga befintliga aktiva uppdrag.')
+  );
+  if(newName===null)return;
+  if(newName.trim()){
+    // Skapa nytt uppdrag
+    var newM={id:Date.now(),name:newName.trim(),date:'',projectIds:pids,extras:[],people:'',created:new Date().toISOString().slice(0,10)};
+    missions.unshift(newM);
+  } else if(missionNames.length){
+    var choice=parseInt(prompt('Välj uppdrag (nummer):'))-1;
+    var targets=missions.filter(function(m){return m.id!==fromMid&&!m.completed;});
+    if(targets[choice]){
+      pids.forEach(function(pid){if(!targets[choice].projectIds.includes(pid))targets[choice].projectIds.push(pid);});
+    }
+  }
+  // Markera ursprungsuppdraget klart
+  var from=missions.find(function(m){return m.id===fromMid;});
+  if(from){from.completed=true;from.completedDate=new Date().toLocaleDateString('sv-SE');}
+  save('missions',missions);
+  renderMissions();
 }
 
 var editingMissionId = null;
