@@ -257,6 +257,20 @@ tr:hover td{background:#f9f9f6}
   <div class="ptitle">God dag, Backerum väntar</div>
   <div class="psub" id="today"></div>
   <div class="kpis" id="kpi-row"></div>
+
+  <!-- VÄDER -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="ch">
+      <div class="ct">Väder vid Backerum</div>
+      <span style="font-size:.78rem;color:var(--ink3)">Sankt Anna, Östergötland</span>
+    </div>
+    <div class="cb" style="padding:12px 16px">
+      <div id="weather-row" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center">
+        <div style="color:var(--ink3);font-size:.82rem;grid-column:1/-1;padding:8px">Hämtar väder...</div>
+      </div>
+    </div>
+  </div>
+
   <div class="tiles">
     <div class="tile" data-goto="ekonomi">
       <div style="width:8px;height:8px;border-radius:50%;background:#3B6D11;margin-bottom:8px"></div>
@@ -1978,10 +1992,71 @@ if(calSettings.airbnbUrl){
   document.getElementById('airbnb-ical-url').value=calSettings.airbnbUrl;
 }
 
+// ── VÄDER ─────────────────────────────────────────
+var WMO_ICONS = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',
+  45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'❄️',73:'❄️',75:'❄️',
+  80:'🌦️',81:'🌧️',82:'🌧️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+var WMO_TEXT = {
+  0:'Klart',1:'Mest klart',2:'Halvklart',3:'Mulet',
+  45:'Dimma',48:'Dimma',
+  51:'Lätt duggregn',53:'Duggregn',55:'Duggregn',
+  61:'Lätt regn',63:'Regn',65:'Kraftigt regn',
+  71:'Lätt snö',73:'Snö',75:'Kraftig snö',
+  80:'Regnskurar',81:'Regnskurar',82:'Kraftiga skurar',
+  95:'Åska',96:'Åska med hagel',99:'Åska med hagel'
+};
+var DAYS_SHORT = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
+
+function fetchWeather(){
+  var lat = 58.3443749;
+  var lon = 16.6534569;
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+    '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max'+
+    '&timezone=Europe%2FStockholm&forecast_days=7';
+
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var d = data.daily;
+      var html = '';
+      for(var i=0;i<7;i++){
+        var date = new Date(d.time[i]);
+        var dayName = i===0?'Idag':i===1?'Imorgon':DAYS_SHORT[date.getDay()];
+        var icon = WMO_ICONS[d.weathercode[i]]||'🌡️';
+        var tmax = Math.round(d.temperature_2m_max[i]);
+        var tmin = Math.round(d.temperature_2m_min[i]);
+        var precip = d.precipitation_sum[i]>0?Math.round(d.precipitation_sum[i]*10)/10+'mm':'';
+        var wind = Math.round(d.windspeed_10m_max[i]);
+        var desc = WMO_TEXT[d.weathercode[i]]||'';
+        html += '<div style="background:var(--c);border-radius:8px;padding:8px 4px;border:1px solid var(--s)">' +
+          '<div style="font-size:.75rem;font-weight:500;color:var(--ink3);margin-bottom:4px">'+dayName+'</div>'+
+          '<div style="font-size:1.4rem;margin-bottom:2px" title="'+desc+'">'+icon+'</div>'+
+          '<div style="font-size:.85rem;font-weight:500;color:var(--ink)">'+tmax+'°</div>'+
+          '<div style="font-size:.75rem;color:var(--ink3)">'+tmin+'°</div>'+
+          (precip?'<div style="font-size:.7rem;color:#2E6DA4;margin-top:2px">'+precip+'</div>':'')+
+          '<div style="font-size:.68rem;color:var(--ink3);margin-top:1px">'+wind+' m/s</div>'+
+          '</div>';
+      }
+      var el = document.getElementById('weather-row');
+      if(el) el.innerHTML = html;
+    })
+    .catch(function(){
+      var el = document.getElementById('weather-row');
+      if(el) el.innerHTML = '<div style="color:var(--ink3);font-size:.82rem;grid-column:1/-1;padding:8px">Kunde inte hämta väder just nu</div>';
+    });
+}
+
 // ── INIT ──────────────────────────────────────────
 var td=new Date().toLocaleDateString('sv-SE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('today').textContent=td.charAt(0).toUpperCase()+td.slice(1);
 renderAll();
+fetchWeather();
 
 // Ladda Google-bibliotek
 var gapiScript=document.createElement('script');
