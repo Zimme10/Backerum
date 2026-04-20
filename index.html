@@ -234,7 +234,7 @@ tr:hover td{background:#f9f9f6}
 </header>
 
 <div id="drive-sync-bar" style="background:#FDF3E0;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;font-size:.82rem;border-bottom:1px solid #e8c98a">
-  <span class="sync-label" style="color:#5C3D2E">Inte ansluten till Drive – klicka "Logga in med Google" för att dela data med din tjej</span>
+  <span class="sync-label" style="color:#5C3D2E">Inte ansluten till Drive – klicka "Logga in med Google" för att dela data med mamman till mina barn och blivande fru ❤️❤️❤️</span>
   <span id="sync-status" style="font-size:.78rem;font-weight:500"></span>
 </div>
 
@@ -297,7 +297,7 @@ tr:hover td{background:#f9f9f6}
   <!-- Nästa uppdrag -->
   <div id="next-mission-box" style="display:none;margin-bottom:14px"></div>
 
-  <!-- Att göra + Inköp sida vid sida -->
+  <!-- Att göra + Inköp + Mat sida vid sida -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
 
     <!-- Att göra -->
@@ -320,6 +320,16 @@ tr:hover td{background:#f9f9f6}
       <div style="padding:4px 10px 10px" id="home-purchase-more"></div>
     </div>
 
+  </div>
+
+  <!-- Mat-handlingslista – full bredd -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch" style="padding:10px 14px">
+      <div class="ct" style="font-size:.88rem">🛒 Handlingslista – mat</div>
+      <button class="btn" style="font-size:.75rem;padding:3px 9px" data-modal="mat">+</button>
+    </div>
+    <div style="padding:8px 10px" id="home-mat-list"></div>
+    <div style="padding:4px 10px 10px" id="home-mat-more"></div>
   </div>
 
   <!-- KPI – smal rad -->
@@ -549,10 +559,11 @@ tr:hover td{background:#f9f9f6}
 <!-- LISTOR -->
 <div class="sec" id="sec-listor">
   <div class="ptitle">Listor</div>
-  <div class="psub">Att göra, inköp och packlista</div>
+  <div class="psub">Att göra, inköp, mat och packlista</div>
   <div class="acts">
     <button class="btn pri" data-modal="todo">+ Att göra</button>
     <button class="btn pri" data-modal="purchase">+ Inköp</button>
+    <button class="btn pri" data-modal="mat">+ Mat</button>
     <button class="btn" data-claude="inkop">Föreslå inköp med Claude →</button>
     <button class="btn" data-claude="packlista">Packlista med Claude →</button>
   </div>
@@ -564,6 +575,16 @@ tr:hover td{background:#f9f9f6}
     <div class="card">
       <div class="ch"><div class="ct">Inköp</div><button class="btn" style="font-size:.78rem;padding:4px 10px" data-modal="purchase">+</button></div>
       <div class="cb"><div class="cl" id="purchase-list"></div></div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <div class="ct">🛒 Handlingslista – mat</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn" style="font-size:.75rem;padding:3px 9px" onclick="clearDoneMat()">Rensa klara</button>
+          <button class="btn" style="font-size:.78rem;padding:4px 10px" data-modal="mat">+</button>
+        </div>
+      </div>
+      <div class="cb"><div class="cl" id="mat-list"></div></div>
     </div>
   </div>
 </div>
@@ -750,6 +771,18 @@ tr:hover td{background:#f9f9f6}
   </div>
 </div>
 
+<!-- Mat-handlingslista modal -->
+<div class="ov" id="ov-mat">
+  <div class="modal">
+    <div class="mh"><div class="mh-t">🛒 Lägg till mat</div><button class="mx" data-close="mat">×</button></div>
+    <div class="mb">
+      <div class="fr"><div class="fl">Matvara</div><input class="fi" type="text" id="mat-text" placeholder="t.ex. Pasta, mjölk, ketchup"></div>
+      <div class="fr"><div class="fl">Antal / mängd</div><input class="fi" type="text" id="mat-amount" placeholder="t.ex. 2 st, 1 liter"></div>
+    </div>
+    <div class="mf"><button class="btn" data-close="mat">Avbryt</button><button class="btn pri" id="btn-save-mat">Lägg till</button></div>
+  </div>
+</div>
+
 <!-- Guide – klistra in från Claude -->
 <div class="ov" id="ov-guide">
   <div class="modal" style="max-width:580px">
@@ -804,6 +837,7 @@ var projects=load('projects',[]);
 var missions=load('missions',[]);
 var todos=load('todos',[]);
 var purchases=load('purchases',[]);
+var matList=load('mat',[]);
 
 // ── SAVE – sparar lokalt OCH till Drive ───────────
 function save(k,v){
@@ -830,7 +864,8 @@ function buildData(){
     projects:projects,
     missions:missions,
     todos:todos,
-    purchases:purchases
+    purchases:purchases,
+    mat:matList
   };
 }
 
@@ -843,6 +878,7 @@ function applyData(d){
   missions=d.missions||[];
   todos=d.todos||[];
   purchases=d.purchases||[];
+  matList=d.mat||[];
   // Spara lokalt också
   ['driveLinks','expenses','guests','projects','missions','todos','purchases'].forEach(function(k){
     saveLocal(k,eval(k));
@@ -972,7 +1008,7 @@ function updateSignInUI(loggedIn){
   var status=document.getElementById('drive-sync-bar');
   if(btn){btn.textContent=loggedIn?'Logga ut från Drive':'Logga in med Google';}
   if(status){status.style.background=loggedIn?'#EAF3DE':'#FDF3E0';
-    status.querySelector('.sync-label').textContent=loggedIn?'Ansluten till Drive – data delas med din tjej':'Inte ansluten till Drive';}
+    status.querySelector('.sync-label').textContent=loggedIn?'Ansluten till Drive – data delas med mamman till mina barn och blivande fru ❤️❤️❤️':'Inte ansluten till Drive';}
 }
 
 
@@ -983,7 +1019,7 @@ var DRIVE_LABELS={ekonomi:'Ekonomi-mappen',budget:'Budget_Backerum.xlsx',uthyrni
 // ── RENDER ALL ────────────────────────────────────
 function renderAll(){
   renderExpenses();renderGuests();renderProjects();
-  renderMissions();renderTodos();renderPurchases();updateKPIs();
+  renderMissions();renderTodos();renderPurchases();renderMat();updateKPIs();
   renderCalendar();renderHomePage();
 }
 
@@ -1252,6 +1288,8 @@ function renderProjects(){
         '<div class="pc-btns">'+
         (!p.completed?'<button class="btn pri" style="font-size:.81rem" onclick="completeProject('+p.id+')">Markera som klar</button>':'')+ 
         '<button class="btn" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
+        (p.todos.length?'<button class="btn ylw" style="font-size:.81rem" onclick="copyTodosToMain('+p.id+')">+ Lägg till i att göra</button>':'')+
+        (p.items.length?'<button class="btn ylw" style="font-size:.81rem" onclick="copyItemsToMain('+p.id+')">+ Lägg till i inköp</button>':'')+
         '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort</button>'+
         '</div></div>'+
         '<div class="pc-right">'+
@@ -1269,7 +1307,39 @@ function renderProjects(){
   updateKPIs();
 }
 
-function completeProject(pid){
+function copyTodosToMain(pid){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var added=0;
+  p.todos.forEach(function(t){
+    if(!t.done){
+      var exists=todos.find(function(x){return x.text===t.text;});
+      if(!exists){todos.unshift({text:t.text,prio:'med',done:false});added++;}
+    }
+  });
+  save('todos',todos);
+  renderTodos();
+  renderHomePage();
+  alert(added?added+' uppgifter tillagda i att-göra-listan!':'Alla uppgifter finns redan i listan.');
+}
+
+function copyItemsToMain(pid){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var added=0;
+  p.items.forEach(function(t){
+    if(!t.done){
+      var exists=purchases.find(function(x){return x.text===t.text;});
+      if(!exists){purchases.unshift({text:t.text,price:0,where:'',done:false});added++;}
+    }
+  });
+  save('purchases',purchases);
+  renderPurchases();
+  renderHomePage();
+  alert(added?added+' inköp tillagda i inköpslistan!':'Alla inköp finns redan i listan.');
+}
+
+
   var p=projects.find(function(x){return x.id===pid;});
   if(!p)return;
   p.completed=true;
@@ -1714,6 +1784,40 @@ function renderPurchases(){
   if(!purchases.length){el.innerHTML='<div style="color:var(--ink3);font-size:.84rem">Inga inköp ännu</div>';return;}
   el.innerHTML=purchases.map(function(p,i){return '<div class="ci'+(p.done?' done':'')+'" onclick="togglePurchase('+i+')"><div class="cbox">'+(p.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+p.text+'</div>'+(p.where?'<div style="font-size:.75rem;color:var(--ink3)">'+p.where+'</div>':'')+'</div>'+(p.price?'<span style="font-size:.81rem;color:var(--ink3)">'+p.price.toLocaleString('sv')+' kr</span>':'')+'</div>';}).join('');
 }
+
+// ── MAT-HANDLINGSLISTA ────────────────────────────
+document.getElementById('btn-save-mat').addEventListener('click',function(){
+  var txt=document.getElementById('mat-text').value.trim();
+  if(!txt)return;
+  var amount=document.getElementById('mat-amount').value.trim();
+  matList.unshift({text:txt+(amount?' ('+amount+')':''),done:false});
+  save('mat',matList);
+  renderMat();
+  renderHomePage();
+  closeModal('mat');
+  document.getElementById('mat-text').value='';
+  document.getElementById('mat-amount').value='';
+});
+
+function toggleMat(idx){matList[idx].done=!matList[idx].done;save('mat',matList);renderMat();renderHomePage();}
+
+function clearDoneMat(){
+  matList=matList.filter(function(m){return !m.done;});
+  save('mat',matList);renderMat();renderHomePage();
+}
+
+function renderMat(){
+  var el=document.getElementById('mat-list');
+  if(!el)return;
+  if(!matList.length){el.innerHTML='<div style="color:var(--ink3);font-size:.84rem">Listan är tom</div>';return;}
+  el.innerHTML=matList.map(function(m,i){
+    return '<div class="ci'+(m.done?' done':'')+'" onclick="toggleMat('+i+')">'+
+      '<div class="cbox">'+(m.done?chk():'')+'</div>'+
+      '<div class="ct2">'+m.text+'</div></div>';
+  }).join('');
+}
+
+
 
 // ── KPIs ──────────────────────────────────────────
 function updateKPIs(){
@@ -2201,6 +2305,28 @@ function renderHomePage(){
         '</div></div>';
     } else {
       nmb.style.display='none';
+    }
+  }
+
+  // Mat-handlingslista – startsidan
+  var hml=document.getElementById('home-mat-list');
+  var hmm=document.getElementById('home-mat-more');
+  if(hml){
+    var openMat=matList.filter(function(m){return !m.done;});
+    if(!openMat.length){
+      hml.innerHTML='<div style="color:var(--ink3);font-size:.82rem;padding:2px 4px">Listan är tom – lägg till mat!</div>';
+    } else {
+      hml.innerHTML=openMat.slice(0,6).map(function(m){
+        var realIdx=matList.indexOf(m);
+        return '<div class="ci'+(m.done?' done':'')+'" onclick="toggleMat('+realIdx+')" style="padding:5px 8px;margin-bottom:2px;border-radius:5px;border:1px solid var(--s);font-size:.84rem;display:flex;align-items:center;gap:8px;cursor:pointer">'+
+          '<div class="cbox" style="width:15px;height:15px;flex-shrink:0">'+(m.done?chk():'')+'</div>'+
+          '<span style="flex:1">'+m.text+'</span></div>';
+      }).join('');
+    }
+    if(hmm){
+      if(openMat.length>6){
+        hmm.innerHTML='<div style="font-size:.78rem;color:var(--g);cursor:pointer;padding:2px 4px" onclick="showSec(\'listor\')">+'+(openMat.length-6)+' till →</div>';
+      } else { hmm.innerHTML=''; }
     }
   }
 
