@@ -254,80 +254,143 @@ tr:hover td{background:#f9f9f6}
 
 <!-- ÖVERSIKT -->
 <div class="sec on" id="sec-hem">
-  <div class="ptitle">God dag, Backerum väntar</div>
-  <div class="psub" id="today"></div>
-  <div class="kpis" id="kpi-row"></div>
 
-  <!-- VÄDER -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="ch">
-      <div class="ct">Väder vid Backerum</div>
-      <span style="font-size:.78rem;color:var(--ink3)">Sankt Anna, Östergötland</span>
+  <!-- Hälsning + datum -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div class="ptitle" style="margin-bottom:2px">Backerum</div>
+      <div style="color:var(--ink3);font-size:.85rem" id="today"></div>
     </div>
-    <div class="cb" style="padding:12px 16px">
-      <div id="weather-row" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center">
-        <div style="color:var(--ink3);font-size:.82rem;grid-column:1/-1;padding:8px">Hämtar väder...</div>
+    <button class="btn pri" id="btn-quickadd" style="display:flex;align-items:center;gap:6px;padding:9px 18px;font-size:.9rem">
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1v12M1 7h12" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      Lägg till
+    </button>
+  </div>
+
+  <!-- VÄDER – kompakt 7 dagar -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch" style="padding:10px 14px">
+      <div class="ct" style="font-size:.88rem">Väder – Sankt Anna</div>
+      <span style="font-size:.75rem;color:var(--ink3)" id="weather-updated"></span>
+    </div>
+    <div style="padding:10px 12px">
+      <!-- Stor idag -->
+      <div id="weather-today" style="display:flex;align-items:center;gap:14px;padding:6px 4px 10px;border-bottom:1px solid var(--s);margin-bottom:10px">
+        <div style="font-size:2.4rem" id="w-icon-today"></div>
+        <div>
+          <div style="font-size:1.6rem;font-weight:500;line-height:1" id="w-temp-today"></div>
+          <div style="font-size:.8rem;color:var(--ink3);margin-top:2px" id="w-desc-today"></div>
+          <div style="font-size:.77rem;color:var(--ink3)" id="w-wind-today"></div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:.8rem;color:#2E6DA4" id="w-rain-today"></div>
+          <div style="font-size:.75rem;color:var(--ink3)" id="w-minmax-today"></div>
+        </div>
+      </div>
+      <!-- 6 dagar liten -->
+      <div id="weather-row" style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center">
+        <div style="color:var(--ink3);font-size:.8rem;grid-column:1/-1">Hämtar väder...</div>
       </div>
     </div>
   </div>
 
-  <div class="tiles">
-    <div class="tile" data-goto="ekonomi">
-      <div style="width:8px;height:8px;border-radius:50%;background:#3B6D11;margin-bottom:8px"></div>
-      <div class="tile-t">Ekonomi</div>
-      <div class="tsub" data-drive="ekonomi">Öppna i Google Drive →</div>
-      <div class="tsub" data-claude="budget">Uppdatera budget med Claude →</div>
-      <div class="tsub" data-modal="expense">Logga ny kostnad</div>
+  <!-- Nästa uppdrag -->
+  <div id="next-mission-box" style="display:none;margin-bottom:14px"></div>
+
+  <!-- Att göra + Inköp sida vid sida -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+
+    <!-- Att göra -->
+    <div class="card">
+      <div class="ch" style="padding:10px 14px">
+        <div class="ct" style="font-size:.88rem">Att göra</div>
+        <button class="btn" style="font-size:.75rem;padding:3px 9px" data-modal="todo">+</button>
+      </div>
+      <div style="padding:8px 10px" id="home-todo-list"></div>
+      <div style="padding:4px 10px 10px" id="home-todo-more"></div>
     </div>
-    <div class="tile" data-goto="uthyrning">
-      <div style="width:8px;height:8px;border-radius:50%;background:#0F6E56;margin-bottom:8px"></div>
-      <div class="tile-t">Uthyrning</div>
-      <div class="tsub" data-drive="uthyrning">Öppna i Google Drive →</div>
-      <div class="tsub" data-claude="gastmail">Skriv gästmail med Claude →</div>
-      <div class="tsub" data-modal="guest">Lägg till bokning</div>
+
+    <!-- Inköp -->
+    <div class="card">
+      <div class="ch" style="padding:10px 14px">
+        <div class="ct" style="font-size:.88rem">Inköp</div>
+        <button class="btn" style="font-size:.75rem;padding:3px 9px" data-modal="purchase">+</button>
+      </div>
+      <div style="padding:8px 10px" id="home-purchase-list"></div>
+      <div style="padding:4px 10px 10px" id="home-purchase-more"></div>
     </div>
-    <div class="tile" data-goto="projekt">
-      <div style="width:8px;height:8px;border-radius:50%;background:#185FA5;margin-bottom:8px"></div>
-      <div class="tile-t">Projekt</div>
-      <div class="tsub" data-drive="projekt">Öppna i Google Drive →</div>
-      <div class="tsub" data-modal="proj">Skapa nytt projekt</div>
-      <div class="tsub" data-modal="import">Importera från Claude</div>
+
+  </div>
+
+  <!-- KPI – smal rad -->
+  <div id="kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px"></div>
+
+  <!-- Snabblänkar -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+    <div class="tile" data-goto="projekt" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#185FA5;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Projekt</div>
     </div>
-    <div class="tile" data-goto="uppdrag">
-      <div style="width:8px;height:8px;border-radius:50%;background:#534AB7;margin-bottom:8px"></div>
-      <div class="tile-t">Uppdrag</div>
-      <div class="tsub" data-modal="mission">Skapa nytt uppdrag</div>
-      <div class="tsub" data-goto="uppdrag">Visa alla uppdrag</div>
+    <div class="tile" data-goto="uppdrag" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#534AB7;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Uppdrag</div>
     </div>
-    <div class="tile" data-goto="bilder">
-      <div style="width:8px;height:8px;border-radius:50%;background:#854F0B;margin-bottom:8px"></div>
-      <div class="tile-t">Bilder</div>
-      <div class="tsub" data-drive="bilder">Öppna i Google Drive →</div>
-      <div class="tsub" data-claude="bilder">Analysera med Claude →</div>
+    <div class="tile" data-goto="uthyrning" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#0F6E56;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Uthyrning</div>
     </div>
-    <div class="tile" data-goto="listor">
-      <div style="width:8px;height:8px;border-radius:50%;background:#6B4FA0;margin-bottom:8px"></div>
-      <div class="tile-t">Listor</div>
-      <div class="tsub" data-modal="todo">Ny att-göra</div>
-      <div class="tsub" data-modal="purchase">Nytt inköp</div>
+    <div class="tile" data-goto="ekonomi" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#3B6D11;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Ekonomi</div>
     </div>
-    <div class="tile" data-goto="bildboken">
-      <div style="width:8px;height:8px;border-radius:50%;background:#993C1D;margin-bottom:8px"></div>
-      <div class="tile-t">Bildboken</div>
-      <div class="tsub" data-claude="bildboken">Planera boken med Claude →</div>
+    <div class="tile" data-goto="bilder" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#854F0B;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Bilder</div>
     </div>
-    <div class="tile" data-goto="dokument">
-      <div style="width:8px;height:8px;border-radius:50%;background:#5F5E5A;margin-bottom:8px"></div>
-      <div class="tile-t">Dokument</div>
-      <div class="tsub" data-drive="dokument">Öppna i Google Drive →</div>
+    <div class="tile" data-goto="bildboken" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#993C1D;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Bildboken</div>
+    </div>
+    <div class="tile" data-goto="dokument" style="padding:10px 12px">
+      <div style="width:7px;height:7px;border-radius:50%;background:#5F5E5A;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Dokument</div>
+    </div>
+    <div class="tile" style="padding:10px 12px" id="btn-drive-config">
+      <div style="width:7px;height:7px;border-radius:50%;background:#D48B2E;margin-bottom:6px"></div>
+      <div style="font-weight:500;font-size:.85rem">Drive</div>
     </div>
   </div>
-  <div class="dnote">
-    <strong>Koppla till Google Drive:</strong> Klicka på knappen nedan, klistra in länkarna till dina Drive-mappar. Sedan öppnar varje kort rätt mapp direkt.
-    <br><br>
-    <button class="btn ylw" id="btn-drive-config">Konfigurera Drive-länkar</button>
+
+</div>
+
+<!-- SNABBLÄGG TILL MODAL -->
+<div class="ov" id="ov-quickadd">
+  <div class="modal" style="max-width:360px">
+    <div class="mh"><div class="mh-t">Vad vill du lägga till?</div><button class="mx" data-close="quickadd">×</button></div>
+    <div class="mb" style="display:flex;flex-direction:column;gap:10px;padding:16px">
+      <button class="btn pri" style="padding:14px;font-size:.95rem;border-radius:10px" data-close="quickadd" data-modal="todo">
+        Att göra
+        <div style="font-size:.78rem;opacity:.75;font-weight:400;margin-top:2px">Lägg till en uppgift</div>
+      </button>
+      <button class="btn" style="padding:14px;font-size:.95rem;border-radius:10px;border-color:#b8ddc2;background:var(--gp)" data-close="quickadd" data-modal="purchase">
+        Inköp
+        <div style="font-size:.78rem;color:var(--ink3);font-weight:400;margin-top:2px">Lägg till något att köpa</div>
+      </button>
+      <button class="btn" style="padding:14px;font-size:.95rem;border-radius:10px;border-color:#b5d4f4;background:#E6F1FB" data-close="quickadd" data-modal="proj">
+        Nytt projekt
+        <div style="font-size:.78rem;color:var(--ink3);font-weight:400;margin-top:2px">Skapa ett renoveringsprojekt</div>
+      </button>
+      <button class="btn" style="padding:14px;font-size:.95rem;border-radius:10px;border-color:#e8c98a;background:var(--ap)" data-close="quickadd" data-modal="expense">
+        Kostnad
+        <div style="font-size:.78rem;color:var(--ink3);font-weight:400;margin-top:2px">Logga en utgift</div>
+      </button>
+    </div>
   </div>
 </div>
+
+<!-- Flytande + knapp på mobil -->
+<button id="fab-btn" onclick="openModal('quickadd')" style="display:none;position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--g);border:none;color:white;font-size:1.5rem;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.25);z-index:500;align-items:center;justify-content:center">+</button>
+
 
 <!-- EKONOMI -->
 <div class="sec" id="sec-ekonomi">
@@ -921,7 +984,7 @@ var DRIVE_LABELS={ekonomi:'Ekonomi-mappen',budget:'Budget_Backerum.xlsx',uthyrni
 function renderAll(){
   renderExpenses();renderGuests();renderProjects();
   renderMissions();renderTodos();renderPurchases();updateKPIs();
-  renderCalendar();
+  renderCalendar();renderHomePage();
 }
 
 // ── CLAUDE PROMPTS ────────────────────────────────
@@ -1495,6 +1558,7 @@ function renderMissions(){
         '<div class="acts" style="margin-top:14px;margin-bottom:0">'+
         (!m.completed?'<button class="btn pri" onclick="completeMission('+m.id+')">Markera genomfört</button>':'')+
         '<button class="btn pri" onclick="printMission('+m.id+')">Skriv ut</button>'+
+        '<button class="btn ylw" onclick="shareMissionLink('+m.id+')">Dela med deltagare</button>'+
         '<button class="btn ylw" onclick="editMission('+m.id+')">Redigera</button>'+
         '<button class="btn" onclick="shareMission('+m.id+')">Kopiera text</button>'+
         '<button class="btn red" onclick="delMission('+m.id+')">Ta bort</button>'+
@@ -2011,50 +2075,222 @@ var WMO_TEXT = {
   80:'Regnskurar',81:'Regnskurar',82:'Kraftiga skurar',
   95:'Åska',96:'Åska med hagel',99:'Åska med hagel'
 };
-var DAYS_SHORT = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
+var DAYS_SHORT=['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
 
 function fetchWeather(){
-  var lat = 58.3443749;
-  var lon = 16.6534569;
-  var url = 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+  var lat=58.3443749, lon=16.6534569;
+  var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
     '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max'+
     '&timezone=Europe%2FStockholm&forecast_days=7';
+  fetch(url).then(function(r){return r.json();}).then(function(data){
+    var d=data.daily;
 
-  fetch(url)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      var d = data.daily;
-      var html = '';
-      for(var i=0;i<7;i++){
-        var date = new Date(d.time[i]);
-        var dayName = i===0?'Idag':i===1?'Imorgon':DAYS_SHORT[date.getDay()];
-        var icon = WMO_ICONS[d.weathercode[i]]||'🌡️';
-        var tmax = Math.round(d.temperature_2m_max[i]);
-        var tmin = Math.round(d.temperature_2m_min[i]);
-        var precip = d.precipitation_sum[i]>0?Math.round(d.precipitation_sum[i]*10)/10+'mm':'';
-        var wind = Math.round(d.windspeed_10m_max[i]);
-        var desc = WMO_TEXT[d.weathercode[i]]||'';
-        html += '<div style="background:var(--c);border-radius:8px;padding:8px 4px;border:1px solid var(--s)">' +
-          '<div style="font-size:.75rem;font-weight:500;color:var(--ink3);margin-bottom:4px">'+dayName+'</div>'+
-          '<div style="font-size:1.4rem;margin-bottom:2px" title="'+desc+'">'+icon+'</div>'+
-          '<div style="font-size:.85rem;font-weight:500;color:var(--ink)">'+tmax+'°</div>'+
-          '<div style="font-size:.75rem;color:var(--ink3)">'+tmin+'°</div>'+
-          (precip?'<div style="font-size:.7rem;color:#2E6DA4;margin-top:2px">'+precip+'</div>':'')+
-          '<div style="font-size:.68rem;color:var(--ink3);margin-top:1px">'+wind+' m/s</div>'+
+    // Idag – stor
+    var todayIcon=document.getElementById('w-icon-today');
+    var todayTemp=document.getElementById('w-temp-today');
+    var todayDesc=document.getElementById('w-desc-today');
+    var todayWind=document.getElementById('w-wind-today');
+    var todayRain=document.getElementById('w-rain-today');
+    var todayMinmax=document.getElementById('w-minmax-today');
+    if(todayIcon){
+      todayIcon.textContent=WMO_ICONS[d.weathercode[0]]||'🌡️';
+      todayTemp.textContent=Math.round(d.temperature_2m_max[0])+'°';
+      todayDesc.textContent=WMO_TEXT[d.weathercode[0]]||'';
+      todayWind.textContent='Vind '+Math.round(d.windspeed_10m_max[0])+' m/s';
+      todayRain.textContent=d.precipitation_sum[0]>0?Math.round(d.precipitation_sum[0]*10)/10+' mm regn':'';
+      todayMinmax.textContent=Math.round(d.temperature_2m_min[0])+'° – '+Math.round(d.temperature_2m_max[0])+'°';
+    }
+    var upd=document.getElementById('weather-updated');
+    if(upd) upd.textContent='Uppdaterad '+new Date().toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
+
+    // 6 dagar framåt – kompakt
+    var row=document.getElementById('weather-row');
+    if(!row) return;
+    var html='';
+    for(var i=1;i<7;i++){
+      var date=new Date(d.time[i]);
+      var dayName=i===1?'Imorgon':DAYS_SHORT[date.getDay()];
+      var icon=WMO_ICONS[d.weathercode[i]]||'🌡️';
+      var tmax=Math.round(d.temperature_2m_max[i]);
+      var tmin=Math.round(d.temperature_2m_min[i]);
+      var precip=d.precipitation_sum[i]>0?Math.round(d.precipitation_sum[i]*10)/10+'mm':'';
+      html+='<div style="background:var(--c);border-radius:6px;padding:6px 3px;border:1px solid var(--s)">'+
+        '<div style="font-size:.7rem;font-weight:500;color:var(--ink3);margin-bottom:2px">'+dayName+'</div>'+
+        '<div style="font-size:1.1rem;margin-bottom:1px">'+icon+'</div>'+
+        '<div style="font-size:.82rem;font-weight:500">'+tmax+'°</div>'+
+        '<div style="font-size:.72rem;color:var(--ink3)">'+tmin+'°</div>'+
+        (precip?'<div style="font-size:.65rem;color:#2E6DA4">'+precip+'</div>':'')+
+        '</div>';
+    }
+    row.innerHTML=html;
+  }).catch(function(){
+    var row=document.getElementById('weather-row');
+    if(row) row.innerHTML='<div style="color:var(--ink3);font-size:.8rem;grid-column:1/-1;padding:6px">Kunde inte hämta väder</div>';
+  });
+}
+
+// ── STARTSIDA – listor och nästa uppdrag ──────────
+function renderHomePage(){
+  // Att göra – topp 5
+  var openTodos=todos.filter(function(t){return !t.done;});
+  var htl=document.getElementById('home-todo-list');
+  var htm=document.getElementById('home-todo-more');
+  if(htl){
+    if(!openTodos.length){
+      htl.innerHTML='<div style="color:var(--ink3);font-size:.82rem;padding:2px 4px">Inget att göra!</div>';
+    } else {
+      htl.innerHTML=openTodos.slice(0,5).map(function(t,i){
+        var realIdx=todos.indexOf(t);
+        return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+realIdx+')" style="padding:6px 8px;margin-bottom:3px;border-radius:6px;border:1px solid var(--s);font-size:.84rem;display:flex;align-items:center;gap:8px;cursor:pointer">'+
+          '<div class="cbox" style="width:15px;height:15px;flex-shrink:0">'+(t.done?chk():'')+'</div>'+
+          '<span style="flex:1'+(t.done?';text-decoration:line-through;opacity:.5':'')+'">'+t.text+'</span>'+
           '</div>';
-      }
-      var el = document.getElementById('weather-row');
-      if(el) el.innerHTML = html;
-    })
-    .catch(function(){
-      var el = document.getElementById('weather-row');
-      if(el) el.innerHTML = '<div style="color:var(--ink3);font-size:.82rem;grid-column:1/-1;padding:8px">Kunde inte hämta väder just nu</div>';
-    });
+      }).join('');
+    }
+    if(htm){
+      if(openTodos.length>5){
+        htm.innerHTML='<div style="font-size:.78rem;color:var(--g);cursor:pointer;padding:2px 4px" onclick="showSec(\'listor\')">+' +(openTodos.length-5)+' till →</div>';
+      } else { htm.innerHTML=''; }
+    }
+  }
+
+  // Inköp – topp 5
+  var openPur=purchases.filter(function(p){return !p.done;});
+  var hpl=document.getElementById('home-purchase-list');
+  var hpm=document.getElementById('home-purchase-more');
+  if(hpl){
+    if(!openPur.length){
+      hpl.innerHTML='<div style="color:var(--ink3);font-size:.82rem;padding:2px 4px">Inget att köpa!</div>';
+    } else {
+      hpl.innerHTML=openPur.slice(0,5).map(function(p){
+        var realIdx=purchases.indexOf(p);
+        return '<div class="ci'+(p.done?' done':'')+'" onclick="togglePurchase('+realIdx+')" style="padding:6px 8px;margin-bottom:3px;border-radius:6px;border:1px solid var(--s);font-size:.84rem;display:flex;align-items:center;gap:8px;cursor:pointer">'+
+          '<div class="cb2" style="width:15px;height:15px;flex-shrink:0;border-radius:3px">'+(p.done?chk():'')+'</div>'+
+          '<span style="flex:1'+(p.done?';text-decoration:line-through;opacity:.5':'')+'">'+p.text+'</span>'+
+          (p.price?'<span style="font-size:.75rem;color:var(--ink3)">'+p.price.toLocaleString('sv')+' kr</span>':'')+
+          '</div>';
+      }).join('');
+    }
+    if(hpm){
+      if(openPur.length>5){
+        hpm.innerHTML='<div style="font-size:.78rem;color:var(--g);cursor:pointer;padding:2px 4px" onclick="showSec(\'listor\')">+' +(openPur.length-5)+' till →</div>';
+      } else { hpm.innerHTML=''; }
+    }
+  }
+
+  // Nästa uppdrag
+  var nmb=document.getElementById('next-mission-box');
+  if(nmb){
+    var active=missions.filter(function(m){return !m.completed&&m.date;});
+    if(active.length){
+      var next=active[0];
+      var mps=projects.filter(function(p){return next.projectIds.includes(p.id);});
+      var done=mps.filter(function(p){return p.completed||p.progress===100;}).length;
+      nmb.style.display='block';
+      nmb.innerHTML='<div style="background:#fff;border:1px solid var(--s);border-radius:var(--r);overflow:hidden">'+
+        '<div style="background:var(--g);padding:10px 16px;display:flex;align-items:center;justify-content:space-between">'+
+        '<div><div style="color:white;font-weight:500;font-size:.93rem">'+next.name+'</div>'+
+        (next.date?'<div style="color:rgba(255,255,255,.65);font-size:.78rem;margin-top:1px">'+next.date+'</div>':'')+
+        '</div>'+
+        '<div style="text-align:right"><div style="color:white;font-size:1rem;font-weight:500">'+done+'/'+mps.length+'</div>'+
+        '<div style="color:rgba(255,255,255,.65);font-size:.72rem">projekt klara</div></div>'+
+        '</div>'+
+        '<div style="height:4px;background:rgba(0,0,0,.08)"><div style="height:100%;width:'+(mps.length?Math.round(done/mps.length*100):0)+'%;background:#4CAF7D;transition:width .3s"></div></div>'+
+        '<div style="padding:8px 16px;display:flex;justify-content:flex-end">'+
+        '<button class="btn" style="font-size:.78rem;padding:4px 12px" onclick="showSec(\'uppdrag\')">Visa uppdrag →</button>'+
+        '</div></div>';
+    } else {
+      nmb.style.display='none';
+    }
+  }
+
+  // Mobil FAB-knapp
+  var fab=document.getElementById('fab-btn');
+  if(fab) fab.style.display='flex';
+}
+
+// Snabblägg-knapp
+document.getElementById('btn-quickadd').addEventListener('click',function(){openModal('quickadd');});
+
+// Quickadd-knappar hanteras av event delegation redan
+
+
+// ── DELA UPPDRAG ──────────────────────────────────
+function shareMissionLink(mid) {
+  var m = missions.find(function(x){return x.id===mid;});
+  if(!m) return;
+
+  // Generera en delnings-token om den inte finns
+  if(!m.shareToken) {
+    m.shareToken = Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);
+    save('missions', missions);
+  }
+
+  var baseUrl = window.location.href.split('?')[0].replace(/\/[^\/]*$/, '/');
+  var shareUrl = baseUrl + 'uppdrag.html?id=' + m.shareToken;
+
+  var mps = projects.filter(function(p){return m.projectIds.includes(p.id);});
+  var mailBody = 'Hej!\n\nDu är inbjuden att delta i uppdraget "' + m.name + '"' +
+    (m.date ? ' – ' + m.date : '') + '.\n\n' +
+    (mps.length ? 'Projekt att göra:\n' + mps.map(function(p){return '• '+p.name;}).join('\n') + '\n\n' : '') +
+    'Öppna länken nedan för att se detaljer, bocka av uppgifter och lägga till kommentarer:\n\n' +
+    shareUrl + '\n\n' +
+    'Hälsningar från Backerum!';
+
+  var mailSubject = 'Uppdrag: ' + m.name + (m.date ? ' – ' + m.date : '');
+
+  // Visa modal med länk och mailalternativ
+  showShareModal(m, shareUrl, mailSubject, mailBody);
+}
+
+function showShareModal(m, url, subject, body) {
+  var existing = document.getElementById('ov-share-mission');
+  if(existing) existing.remove();
+
+  var modal = document.createElement('div');
+  modal.className = 'ov on';
+  modal.id = 'ov-share-mission';
+  modal.innerHTML = '<div class="modal" style="max-width:520px">'+
+    '<div class="mh"><div class="mh-t">Dela uppdrag – '+m.name+'</div><button class="mx" onclick="document.getElementById(\'ov-share-mission\').remove()">×</button></div>'+
+    '<div class="mb">'+
+    '<div class="info" style="margin-bottom:14px">Deltagarna öppnar länken, skriver sitt namn och kan bocka av uppgifter. De ser bara detta uppdrag – inte ekonomi eller annan info.</div>'+
+    '<div class="fr"><div class="fl">Delningslänk</div>'+
+    '<div style="display:flex;gap:6px">'+
+    '<input class="fi" type="text" value="'+url+'" id="share-url-input" readonly style="flex:1;font-size:.8rem;font-family:monospace">'+
+    '<button class="btn pri" onclick="copyShareUrl()">Kopiera</button>'+
+    '</div></div>'+
+    '<div class="fr" style="margin-top:8px"><div class="fl">Öppna i mailprogram</div>'+
+    '<a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" class="btn pri" style="display:inline-block;text-decoration:none;text-align:center">Öppna mail med länk</a>'+
+    '</div>'+
+    (m.participants&&m.participants.length?
+      '<div class="fr" style="margin-top:8px"><div class="fl">Deltagare som öppnat länken</div>'+
+      '<div style="display:flex;flex-direction:column;gap:4px">'+
+      m.participants.map(function(p){return '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--c);border-radius:6px;font-size:.85rem">'+
+        '<div style="width:28px;height:28px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:500;color:#1A4D2E;font-size:.8rem">'+p.name.charAt(0).toUpperCase()+'</div>'+
+        p.name + '<span style="color:var(--ink3);font-size:.75rem;margin-left:auto">'+p.joined+'</span>'+
+        '</div>';}).join('')+
+      '</div></div>' : '')+
+    '</div>'+
+    '<div class="mf"><button class="btn" onclick="document.getElementById(\'ov-share-mission\').remove()">Stäng</button></div>'+
+    '</div>';
+
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+function copyShareUrl() {
+  var input = document.getElementById('share-url-input');
+  if(input) {
+    navigator.clipboard.writeText(input.value)
+      .then(function(){ alert('Länken kopierad!'); })
+      .catch(function(){ input.select(); document.execCommand('copy'); alert('Länken kopierad!'); });
+  }
 }
 
 // ── INIT ──────────────────────────────────────────
 var td=new Date().toLocaleDateString('sv-SE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-document.getElementById('today').textContent=td.charAt(0).toUpperCase()+td.slice(1);
+var todayEl=document.getElementById('today');
+if(todayEl) todayEl.textContent=td.charAt(0).toUpperCase()+td.slice(1);
 renderAll();
 fetchWeather();
 
