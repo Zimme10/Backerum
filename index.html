@@ -229,7 +229,7 @@ tr:hover td{background:#f9f9f6}
     <button class="hbtn" id="btn-new-proj">+ Nytt projekt</button>
     <button class="hbtn" id="btn-new-mission">+ Nytt uppdrag</button>
     <button class="hbtn" id="btn-print">Skriv ut</button>
-    <button class="hbtn" id="btn-signin" onclick="signIn()">Logga in med Google</button>
+    <button class="hbtn" id="btn-signin">Logga in med Google</button>
   </div>
 </header>
 
@@ -1132,8 +1132,6 @@ document.getElementById('btn-new-mission').addEventListener('click',function(){o
 document.getElementById('btn-print').addEventListener('click',function(){printAll();});
 document.getElementById('btn-drive-config').addEventListener('click',function(){openModal('drive');});
 document.getElementById('btn-print-missions').addEventListener('click',function(){printAll();});
-document.getElementById('btn-quickadd').addEventListener('click',function(){openModal('quickadd');});
-
 
 // ── DRIVE CONFIG ──────────────────────────────────
 function buildDriveFields(){
@@ -1354,7 +1352,7 @@ function copyItemsToMain(pid){
   alert(added?added+' inköp tillagda i inköpslistan!':'Alla inköp finns redan i listan.');
 }
 
-
+function completeProject(pid){
   var p=projects.find(function(x){return x.id===pid;});
   if(!p)return;
   p.completed=true;
@@ -2358,6 +2356,7 @@ function renderHomePage(){
 
 // Snabblägg-knapp
 document.getElementById('btn-quickadd').addEventListener('click',function(){openModal('quickadd');});
+document.getElementById('btn-signin').addEventListener('click',function(){if(isSignedIn){signOut();}else{signIn();}});
 
 // Quickadd-knappar hanteras av event delegation redan
 
