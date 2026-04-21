@@ -1425,54 +1425,6 @@ function delProject(pid){
   renderProjects();
 }
 
-function renderProjects(){
-  var el=document.getElementById('proj-list');
-  var em=document.getElementById('proj-empty');
-  if(!projects.length){el.innerHTML='';em.style.display='block';updateKPIs();return;}
-  em.style.display='none';
-  var catCol={Utomhus:'#3B6D11',Inomhus:'#185FA5',Trädgård:'#2D7A4F',Bryggan:'#0F6E56',Renovering:'#854F0B',Övrigt:'#5F5E5A'};
-  el.innerHTML=projects.map(function(p){
-    var cc=catCol[p.cat]||'#5F5E5A';
-    var dt=p.todos.filter(function(t){return t.done;}).length;
-    var di=p.items.filter(function(t){return t.done;}).length;
-    var pct=p.progress;
-    var pcolor=pct===100?'#1A4D2E':pct>0?'#D48B2E':'#9e9e8e';
-
-    var thtml=p.todos.map(function(t,i){
-      return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',false)"><div class="cb2">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
-    }).join('');
-    var ihtml=p.items.map(function(t,i){
-      return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',true)"><div class="cb2 sq">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
-    }).join('');
-
-    return '<div class="pc">'+
-      '<div class="pc-top"><div class="pc-bar" style="background:'+cc+'"></div>'+
-      '<div class="pc-info">'+
-      '<div><div class="pc-name">'+p.name+'</div><div class="pc-meta" style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:'+cc+';display:inline-block"></span>'+p.cat+(p.budget?' &nbsp;·&nbsp; '+p.budget.toLocaleString('sv')+' kr':'')+'&nbsp;·&nbsp;'+p.created+'</div></div>'+
-      '<div class="pc-pct" style="color:'+pcolor+'">'+pct+'%</div></div></div>'+
-      '<div class="pc-prog"><div class="pc-fill" style="width:'+pct+'%"></div></div>'+
-      '<div class="pc-body">'+
-      '<div class="pc-left">'+
-      (p.desc?'<div class="pc-desc">'+p.desc+'</div>':'')+
-      '<div class="pc-stats">'+
-      '<div class="pc-stat" style="background:var(--gp)"><div class="pc-stat-v" style="color:#1A4D2E">'+dt+'/'+p.todos.length+'</div><div class="pc-stat-l">Steg klara</div></div>'+
-      '<div class="pc-stat" style="background:var(--ap)"><div class="pc-stat-v" style="color:#854F0B">'+di+'/'+p.items.length+'</div><div class="pc-stat-l">Inköp klara</div></div>'+
-      '</div>'+
-      '<div class="pc-btns">'+
-      '<button class="btn pri" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
-      '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort projekt</button>'+
-      '</div></div>'+
-      '<div class="pc-right">'+
-      (p.todos.length?'<div class="cl-head" style="color:#1A4D2E">ATT GÖRA</div>'+thtml:'')+ 
-      (p.items.length?'<div class="cl-head" style="color:#854F0B;margin-top:'+(p.todos.length?'10px':'0')+'">INKÖP</div>'+ihtml:'')+ 
-      (!p.todos.length&&!p.items.length?'<div style="color:var(--ink3);font-size:.84rem">Inga punkter</div>':'')+
-      '</div></div>'+
-      (p.guide?'<div style="border-top:1px solid var(--s);padding:14px 16px;background:#f9faf7"><div style="font-size:.72rem;font-weight:500;color:#1A4D2E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">GUIDE FRÅN CLAUDE</div><div style="font-size:.86rem;color:var(--ink2);line-height:1.65;white-space:pre-wrap">'+p.guide+'</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn" style="font-size:.78rem" onclick="openGuide('+p.id+')">Uppdatera guide</button><button class="btn red" style="font-size:.78rem" onclick="clearGuide('+p.id+')">Ta bort guide</button></div></div>':'')+ 
-      '</div>';
-  }).join('');
-  updateKPIs();
-}
-
 // ── MISSIONS ──────────────────────────────────────
 function buildMissionSel(){
   var el=document.getElementById('mission-proj-sel');
