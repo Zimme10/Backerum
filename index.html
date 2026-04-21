@@ -1298,19 +1298,28 @@ function renderProjects(){
         '<button class="btn" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
         '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort</button>'+
         '</div>'+
-        ((!p.completed&&(p.todos.length||p.items.length))?
-          '<div style="margin-top:10px;padding:8px;background:var(--gp);border-radius:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+
-          '<span style="font-size:.75rem;color:#1A4D2E;font-weight:500">Flytta till huvudlistan:</span>'+
-          (p.todos.length?'<button class="btn" style="font-size:.79rem;padding:4px 10px;background:#fff;border-color:#b8ddc2" onclick="copyTodosToMain('+p.id+')">+ Att göra</button>':'')+
-          (p.items.length?'<button class="btn" style="font-size:.79rem;padding:4px 10px;background:#fff;border-color:#b8ddc2" onclick="copyItemsToMain('+p.id+')">+ Inköp</button>':'')+
-          '</div>':'')+
         '</div></div>'+
         '<div class="pc-right">'+
         (p.todos.length?'<div class="cl-head" style="color:#1A4D2E">ATT GÖRA</div>'+thtml:'')+ 
-        (p.items.length?'<div class="cl-head" style="color:#854F0B;margin-top:'+(p.todos.length?'10px':'0')+'">INKÖP</div>'+ihtml:'')+ 
+        (p.items.length?
+          '<div class="cl-head" style="color:#854F0B;margin-top:'+(p.todos.length?'10px':'0')+'">INKÖP</div>'+
+          ihtml+
+          (!p.completed?'<button onclick="copyItemsToMain('+p.id+')" style="margin-top:8px;width:100%;padding:6px;background:#FDF3E0;border:1px solid #e8c98a;border-radius:6px;font-size:.78rem;color:#854F0B;cursor:pointer;font-family:inherit">+ Flytta inköp till huvudlistan</button>':''):
+          '')+
         (!p.todos.length&&!p.items.length?'<div style="color:var(--ink3);font-size:.84rem">Inga punkter</div>':'')+
+        (p.todos.length&&!p.completed?'<button onclick="copyTodosToMain('+p.id+')" style="margin-top:8px;width:100%;padding:6px;background:#EAF3DE;border:1px solid #b8ddc2;border-radius:6px;font-size:.78rem;color:#1A4D2E;cursor:pointer;font-family:inherit">+ Flytta att göra till huvudlistan</button>':'')+
         '</div></div>'+
-        (p.guide?'<div style="border-top:1px solid var(--s);padding:14px 16px;background:#f9faf7"><div style="font-size:.72rem;font-weight:500;color:#1A4D2E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">GUIDE FRÅN CLAUDE</div><div style="font-size:.86rem;color:var(--ink2);line-height:1.65;white-space:pre-wrap">'+p.guide+'</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn" style="font-size:.78rem" onclick="openGuide('+p.id+')">Uppdatera guide</button><button class="btn red" style="font-size:.78rem" onclick="clearGuide('+p.id+')">Ta bort guide</button></div></div>':'')+ 
+        (p.guide?
+          '<div style="border-top:1px solid var(--s)">'+
+          '<div onclick="toggleGuideExpand(\'g'+p.id+'\')" style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#f9faf7">'+
+          '<div style="font-size:.72rem;font-weight:500;color:#1A4D2E;text-transform:uppercase;letter-spacing:.06em">Guide från Claude</div>'+
+          '<div id="garr'+p.id+'" style="font-size:.8rem;color:var(--ink3)">▼ Visa</div></div>'+
+          '<div id="g'+p.id+'" style="display:none;padding:14px 16px;background:#f9faf7;border-top:1px solid var(--s)">'+
+          '<div style="font-size:.86rem;color:var(--ink2);line-height:1.65;white-space:pre-wrap">'+p.guide+'</div>'+
+          '<div style="margin-top:10px;display:flex;gap:8px">'+
+          '<button class="btn" style="font-size:.78rem" onclick="openGuide('+p.id+')">Uppdatera guide</button>'+
+          '<button class="btn red" style="font-size:.78rem" onclick="clearGuide('+p.id+')">Ta bort guide</button>'+
+          '</div></div></div>':'')+ 
         '</div>';
     }).join('');
   }
@@ -1318,6 +1327,15 @@ function renderProjects(){
   renderProjCards(active, el, false);
   renderProjCards(done, doneList, true);
   updateKPIs();
+}
+
+function toggleGuideExpand(id){
+  var el=document.getElementById(id);
+  var arr=document.getElementById('garr'+id.slice(1));
+  if(!el)return;
+  var open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  if(arr)arr.textContent=open?'▲ Dölj':'▼ Visa';
 }
 
 function copyTodosToMain(pid){
