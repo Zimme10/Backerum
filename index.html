@@ -763,9 +763,15 @@ tr:hover td{background:#f9f9f6}
   <div class="modal">
     <div class="mh"><div class="mh-t">Nytt inköp</div><button class="mx" data-close="purchase">×</button></div>
     <div class="mb">
-      <div class="fr"><div class="fl">Artikel</div><input class="fi" type="text" id="pur-text" placeholder="t.ex. Fogsand, 3 säckar"></div>
-      <div class="fr"><div class="fl">Ungefärligt pris (kr)</div><input class="fi" type="number" id="pur-price" placeholder="0"></div>
-      <div class="fr"><div class="fl">Var köps det?</div><input class="fi" type="text" id="pur-where" placeholder="t.ex. Bauhaus"></div>
+      <div class="fr">
+        <div class="fl">Artikel(ar) – en per rad för att lägga till flera</div>
+        <textarea class="ft" id="pur-text" style="min-height:90px" placeholder="Fogsand&#10;Högtryckstvätt&#10;Trädgårdshandskar"></textarea>
+      </div>
+      <div class="fg">
+        <div class="fr"><div class="fl">Ungefärligt pris (kr)</div><input class="fi" type="number" id="pur-price" placeholder="0"></div>
+        <div class="fr"><div class="fl">Var köps det?</div><input class="fi" type="text" id="pur-where" placeholder="t.ex. Bauhaus"></div>
+      </div>
+      <div style="font-size:.77rem;color:var(--ink3);margin-top:4px">Pris och butik är valfritt – lämna tomt för snabb inmatning</div>
     </div>
     <div class="mf"><button class="btn" data-close="purchase">Avbryt</button><button class="btn pri" id="btn-save-purchase">Spara</button></div>
   </div>
@@ -1007,8 +1013,11 @@ function updateSignInUI(loggedIn){
   var btn=document.getElementById('btn-signin');
   var status=document.getElementById('drive-sync-bar');
   if(btn){btn.textContent=loggedIn?'Logga ut från Drive':'Logga in med Google';}
-  if(status){status.style.background=loggedIn?'#EAF3DE':'#FDF3E0';
-    status.querySelector('.sync-label').textContent=loggedIn?'Ansluten till Drive – data delas med mamman till mina barn och blivande fru ❤️❤️❤️':'Inte ansluten till Drive';}
+  if(status){
+    status.style.background=loggedIn?'#EAF3DE':'#FDF3E0';
+    status.style.borderBottomColor=loggedIn?'#b8ddc2':'#e8c98a';
+    status.querySelector('.sync-label').style.color=loggedIn?'#1A4D2E':'#5C3D2E';
+    status.querySelector('.sync-label').textContent=loggedIn?'Inloggad i Familjen Winterås Hanssons sommarparadis ❤️❤️❤️':'Inte ansluten till Drive – klicka "Logga in med Google" för att dela data med mamman till mina barn och blivande fru ❤️❤️❤️';}
 }
 
 
@@ -1109,7 +1118,6 @@ document.querySelectorAll('.ov').forEach(function(ov){
 document.addEventListener('click',function(e){
   var el=e.target.closest('[data-modal],[data-goto],[data-drive],[data-claude],[data-close]');
   if(!el)return;
-  e.stopPropagation();
 
   if(el.dataset.modal)  openModal(el.dataset.modal);
   if(el.dataset.goto)   showSec(el.dataset.goto);
@@ -1124,6 +1132,8 @@ document.getElementById('btn-new-mission').addEventListener('click',function(){o
 document.getElementById('btn-print').addEventListener('click',function(){printAll();});
 document.getElementById('btn-drive-config').addEventListener('click',function(){openModal('drive');});
 document.getElementById('btn-print-missions').addEventListener('click',function(){printAll();});
+document.getElementById('btn-quickadd').addEventListener('click',function(){openModal('quickadd');});
+
 
 // ── DRIVE CONFIG ──────────────────────────────────
 function buildDriveFields(){
@@ -1288,9 +1298,14 @@ function renderProjects(){
         '<div class="pc-btns">'+
         (!p.completed?'<button class="btn pri" style="font-size:.81rem" onclick="completeProject('+p.id+')">Markera som klar</button>':'')+ 
         '<button class="btn" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
-        (p.todos.length?'<button class="btn ylw" style="font-size:.81rem" onclick="copyTodosToMain('+p.id+')">+ Lägg till i att göra</button>':'')+
-        (p.items.length?'<button class="btn ylw" style="font-size:.81rem" onclick="copyItemsToMain('+p.id+')">+ Lägg till i inköp</button>':'')+
         '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort</button>'+
+        '</div>'+
+        ((!p.completed&&(p.todos.length||p.items.length))?
+          '<div style="margin-top:10px;padding:8px;background:var(--gp);border-radius:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+
+          '<span style="font-size:.75rem;color:#1A4D2E;font-weight:500">Flytta till huvudlistan:</span>'+
+          (p.todos.length?'<button class="btn" style="font-size:.79rem;padding:4px 10px;background:#fff;border-color:#b8ddc2" onclick="copyTodosToMain('+p.id+')">+ Att göra</button>':'')+
+          (p.items.length?'<button class="btn" style="font-size:.79rem;padding:4px 10px;background:#fff;border-color:#b8ddc2" onclick="copyItemsToMain('+p.id+')">+ Inköp</button>':'')+
+          '</div>':'')+
         '</div></div>'+
         '<div class="pc-right">'+
         (p.todos.length?'<div class="cl-head" style="color:#1A4D2E">ATT GÖRA</div>'+thtml:'')+ 
@@ -1768,11 +1783,17 @@ function renderTodos(){
 
 // ── PURCHASES ─────────────────────────────────────
 document.getElementById('btn-save-purchase').addEventListener('click',function(){
-  var txt=document.getElementById('pur-text').value.trim();
-  if(!txt)return;
-  purchases.unshift({text:txt,price:parseInt(document.getElementById('pur-price').value)||0,where:document.getElementById('pur-where').value,done:false});
+  var raw=document.getElementById('pur-text').value.trim();
+  if(!raw)return;
+  var price=parseInt(document.getElementById('pur-price').value)||0;
+  var where=document.getElementById('pur-where').value.trim();
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+  lines.forEach(function(txt){
+    purchases.unshift({text:txt,price:price,where:where,done:false});
+  });
   save('purchases',purchases);
   renderPurchases();
+  renderHomePage();
   closeModal('purchase');
   document.getElementById('pur-text').value='';
   document.getElementById('pur-price').value='';
