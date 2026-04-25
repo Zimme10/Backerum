@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backerum – Uppdrag</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#1A4D2E;--gm:#2D7A4F;--gp:#EAF3DE;--s:#E8E8DC;--c:#FAFAF5;--ink:#1C1C1A;--ink2:#4A4A44;--ink3:#8A8A80;--ap:#FDF3E0;--r:10px;--rs:6px}
+body{font-family:'DM Sans',sans-serif;background:var(--c);color:var(--ink);min-height:100vh}
+header{background:var(--g);color:#fff;padding:14px 20px}
+.logo{font-family:'Playfair Display',serif;font-size:1.2rem}
+.logo em{font-style:normal;opacity:.5;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:300;margin-left:8px}
+main{padding:20px;max-width:680px;margin:0 auto}
+.card{background:#fff;border:1px solid var(--s);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.ch{padding:12px 16px;border-bottom:1px solid var(--s);display:flex;align-items:center;justify-content:space-between}
+.ct{font-weight:500;font-size:.95rem}
+.cb{padding:14px 16px}
+.btn{padding:8px 18px;border-radius:20px;border:1px solid var(--s);background:#fff;color:var(--ink);font-size:.85rem;cursor:pointer;font-family:inherit}
+.btn.pri{background:var(--g);color:#fff;border-color:var(--g)}
+.btn:hover{opacity:.9}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;margin-bottom:4px;border:1px solid var(--s);background:#fff}
+.ci:hover{background:var(--c)}
+.ci.done{opacity:.55}
+.ci.done .ct2{text-decoration:line-through}
+.cbox{width:20px;height:20px;border-radius:50%;border:1.5px solid #aaa;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.ci.done .cbox{background:var(--g);border-color:var(--g)}
+.ct2{flex:1;font-size:.9rem;line-height:1.5}
+.who{font-size:.72rem;color:var(--ink3);margin-top:2px}
+.cb2{width:18px;height:18px;border-radius:3px;border:1.5px solid #aaa;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.ci.done .cb2{background:#D48B2E;border-color:#D48B2E}
+.ptitle{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:4px}
+.psub{color:var(--ink3);font-size:.87rem;margin-bottom:20px}
+.badge-green{background:var(--gp);color:#1A4D2E;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:500}
+.badge-gray{background:var(--s);color:var(--ink2);padding:2px 10px;border-radius:20px;font-size:.75rem}
+.info{background:var(--gp);border:1px solid #b8ddc2;border-radius:var(--rs);padding:12px 16px;font-size:.84rem;color:#1A4D2E;margin-bottom:16px;line-height:1.55}
+.fi{padding:9px 12px;border:1px solid var(--s);border-radius:var(--rs);font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;outline:none;width:100%}
+.fi:focus{border-color:var(--g)}
+.ft{min-height:80px;resize:vertical;padding:9px 12px;border:1px solid var(--s);border-radius:var(--rs);font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;outline:none;width:100%}
+.ft:focus{border-color:var(--g)}
+.cl-head{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;color:var(--ink3)}
+.prog-bg{height:6px;background:var(--s);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.prog-fill{height:100%;background:#4CAF7D;transition:width .4s}
+.participant{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--c);border-radius:6px;font-size:.85rem;margin-bottom:4px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:500;color:#1A4D2E;font-size:.8rem;flex-shrink:0}
+#name-screen{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.name-card{background:#fff;border-radius:var(--r);padding:24px;max-width:380px;width:100%}
+.name-title{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:8px}
+.name-sub{color:var(--ink3);font-size:.87rem;margin-bottom:18px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- Namnfråga -->
+<div id="name-screen">
+  <div class="name-card">
+    <div class="name-title">Välkommen till Backerum!</div>
+    <div class="name-sub" id="name-mission-title">Du är inbjuden till ett uppdrag. Skriv ditt namn för att fortsätta.</div>
+    <input class="fi" type="text" id="participant-name" placeholder="Ditt namn" style="margin-bottom:12px" autocomplete="given-name">
+    <button class="btn pri" style="width:100%" onclick="joinMission()">Fortsätt</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">Backerum <em>Sommarstugan</em></div>
+</header>
+
+<main id="main-content" style="display:none">
+  <div class="ptitle" id="mission-title"></div>
+  <div class="psub" id="mission-meta"></div>
+
+  <div class="info" id="participant-list-box" style="display:none">
+    <strong>Deltagare:</strong> <span id="participant-names"></span>
+  </div>
+
+  <!-- Progress -->
+  <div id="progress-section" style="margin-bottom:16px;display:none">
+    <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--ink3);margin-bottom:4px">
+      <span>Framsteg</span><span id="progress-label"></span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Projekt -->
+  <div id="projects-section"></div>
+
+  <!-- Glöm inte -->
+  <div id="extras-section"></div>
+
+  <!-- Kommentarer -->
+  <div class="card">
+    <div class="ch"><div class="ct">Kommentarer & meddelanden</div></div>
+    <div class="cb">
+      <div id="comments-list" style="margin-bottom:12px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <textarea class="ft" id="comment-input" placeholder="Skriv ett meddelande till gruppen..."></textarea>
+        <button class="btn pri" onclick="addComment()">Skicka</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+var TOKEN = '';
+var MY_NAME = '';
+var DATA_KEY = 'br_missions';
+var PROJ_KEY = 'br_projects';
+var SHARE_KEY = 'br_share_';
+var mission = null;
+var sharedData = null;
+
+// Hämta token från URL
+function getToken() {
+  var params = new URLSearchParams(window.location.search);
+  return params.get('id') || '';
+}
+
+TOKEN = getToken();
+if(!TOKEN) {
+  document.getElementById('name-screen').innerHTML = '<div class="name-card"><div class="name-title">Ogiltig länk</div><div class="name-sub">Denna länk är inte giltig. Kontakta värden för en ny länk.</div></div>';
+}
+
+// Hämta delade data från localStorage (om de öppnar på samma enhet)
+// eller från en delad nyckel
+function loadSharedData() {
+  // Försök hämta från localStorage med token-nyckel
+  try {
+    var raw = localStorage.getItem(SHARE_KEY + TOKEN);
+    if(raw) return JSON.parse(raw);
+  } catch(e) {}
+  return null;
+}
+
+function saveSharedData(data) {
+  try {
+    localStorage.setItem(SHARE_KEY + TOKEN, JSON.stringify(data));
+  } catch(e) {}
+}
+
+// Hitta uppdraget via token
+function findMissionByToken(token) {
+  try {
+    var missions = JSON.parse(localStorage.getItem('br_missions') || '[]');
+    return missions.find(function(m){ return m.shareToken === token; });
+  } catch(e) { return null; }
+}
+
+function joinMission() {
+  var name = document.getElementById('participant-name').value.trim();
+  if(!name) { alert('Ange ditt namn'); return; }
+  MY_NAME = name;
+
+  // Hämta eller skapa delad data
+  sharedData = loadSharedData();
+
+  if(!sharedData) {
+    // Försök hitta uppdraget lokalt
+    mission = findMissionByToken(TOKEN);
+    if(!mission) {
+      showError('Uppdraget hittades inte. Kontakta värden – de kan behöva öppna appen för att aktivera delningen.');
+      return;
+    }
+    var projects = JSON.parse(localStorage.getItem('br_projects') || '[]');
+    var mps = projects.filter(function(p){ return mission.projectIds.includes(p.id); });
+
+    sharedData = {
+      token: TOKEN,
+      missionId: mission.id,
+      name: mission.name,
+      date: mission.date || '',
+      people: mission.people || '',
+      projects: mps.map(function(p){
+        return {
+          id: p.id,
+          name: p.name,
+          cat: p.cat,
+          desc: p.desc,
+          todos: p.todos.map(function(t){ return {text:t.text, done:t.done, doneBy:'', doneAt:''}; }),
+          items: p.items.map(function(t){ return {text:t.text, done:t.done, doneBy:'', doneAt:''}; })
+        };
+      }),
+      extras: (mission.extras||[]).map(function(e){ return {text:e.text, done:e.done, doneBy:'', doneAt:''}; }),
+      participants: [],
+      comments: []
+    };
+    saveSharedData(sharedData);
+
+    // Uppdatera även huvud-appen med deltagaren
+    updateMainAppParticipant(name);
+  }
+
+  // Lägg till som deltagare om inte redan med
+  var exists = sharedData.participants.find(function(p){ return p.name.toLowerCase()===name.toLowerCase(); });
+  if(!exists) {
+    sharedData.participants.push({name:name, joined:new Date().toLocaleDateString('sv-SE')});
+    saveSharedData(sharedData);
+    updateMainAppParticipant(name);
+  }
+
+  document.getElementById('name-screen').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  renderMission();
+}
+
+function updateMainAppParticipant(name) {
+  try {
+    var missions = JSON.parse(localStorage.getItem('br_missions') || '[]');
+    var m = missions.find(function(x){ return x.shareToken === TOKEN; });
+    if(m) {
+      if(!m.participants) m.participants = [];
+      var ex = m.participants.find(function(p){ return p.name.toLowerCase()===name.toLowerCase(); });
+      if(!ex) {
+        m.participants.push({name:name, joined:new Date().toLocaleDateString('sv-SE')});
+        localStorage.setItem('br_missions', JSON.stringify(missions));
+      }
+    }
+  } catch(e) {}
+}
+
+function showError(msg) {
+  document.getElementById('name-screen').innerHTML = '<div class="name-card"><div class="name-title">Hoppsan</div><div class="name-sub">'+msg+'</div></div>';
+}
+
+function chk() {
+  return '<svg width="11" height="11" viewBox="0 0 11 11"><path d="M2 5.5l2.5 2.5L9 3" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>';
+}
+
+function toggleTodo(projIdx, todoIdx, isBuy) {
+  var p = sharedData.projects[projIdx];
+  var arr = isBuy ? p.items : p.todos;
+  arr[todoIdx].done = !arr[todoIdx].done;
+  arr[todoIdx].doneBy = arr[todoIdx].done ? MY_NAME : '';
+  arr[todoIdx].doneAt = arr[todoIdx].done ? new Date().toLocaleDateString('sv-SE') : '';
+
+  // Synka tillbaka till huvud-appen
+  syncToMainApp(projIdx, todoIdx, isBuy, arr[todoIdx].done);
+  saveSharedData(sharedData);
+  renderMission();
+}
+
+function syncToMainApp(projIdx, todoIdx, isBuy, done) {
+  try {
+    var projects = JSON.parse(localStorage.getItem('br_projects') || '[]');
+    var p = sharedData.projects[projIdx];
+    var mainProj = projects.find(function(x){ return x.id === p.id; });
+    if(mainProj) {
+      var arr = isBuy ? mainProj.items : mainProj.todos;
+      if(arr[todoIdx]) arr[todoIdx].done = done;
+      var total = mainProj.todos.length + mainProj.items.length;
+      var doneCount = mainProj.todos.filter(function(t){return t.done;}).length + mainProj.items.filter(function(t){return t.done;}).length;
+      mainProj.progress = total ? Math.round(doneCount/total*100) : 0;
+      localStorage.setItem('br_projects', JSON.stringify(projects));
+    }
+  } catch(e) {}
+}
+
+function toggleExtra(idx) {
+  sharedData.extras[idx].done = !sharedData.extras[idx].done;
+  sharedData.extras[idx].doneBy = sharedData.extras[idx].done ? MY_NAME : '';
+  sharedData.extras[idx].doneAt = sharedData.extras[idx].done ? new Date().toLocaleDateString('sv-SE') : '';
+  saveSharedData(sharedData);
+  renderMission();
+}
+
+function addComment() {
+  var text = document.getElementById('comment-input').value.trim();
+  if(!text) return;
+  sharedData.comments.push({name:MY_NAME, text:text, time:new Date().toLocaleString('sv-SE')});
+  saveSharedData(sharedData);
+  document.getElementById('comment-input').value = '';
+  renderMission();
+}
+
+function renderMission() {
+  var d = sharedData;
+
+  // Header
+  document.getElementById('mission-title').textContent = d.name;
+  var meta = [];
+  if(d.date) meta.push(d.date);
+  if(d.people) meta.push('Deltagare: '+d.people);
+  document.getElementById('mission-meta').textContent = meta.join(' · ');
+  document.title = 'Backerum – ' + d.name;
+
+  // Deltagare
+  if(d.participants.length) {
+    document.getElementById('participant-list-box').style.display = 'block';
+    document.getElementById('participant-names').textContent = d.participants.map(function(p){return p.name;}).join(', ');
+  }
+
+  // Progress
+  var totalItems = 0, doneItems = 0;
+  d.projects.forEach(function(p){
+    totalItems += p.todos.length + p.items.length;
+    doneItems += p.todos.filter(function(t){return t.done;}).length + p.items.filter(function(t){return t.done;}).length;
+  });
+  totalItems += d.extras.length;
+  doneItems += d.extras.filter(function(e){return e.done;}).length;
+
+  if(totalItems > 0) {
+    document.getElementById('progress-section').style.display = 'block';
+    var pct = Math.round(doneItems/totalItems*100);
+    document.getElementById('progress-label').textContent = doneItems+'/'+totalItems+' klara ('+pct+'%)';
+    document.getElementById('prog-fill').style.width = pct+'%';
+  }
+
+  // Projekt
+  var ps = document.getElementById('projects-section');
+  ps.innerHTML = d.projects.map(function(p, pi){
+    var dt = p.todos.filter(function(t){return t.done;}).length;
+    var di = p.items.filter(function(t){return t.done;}).length;
+    var ptotal = p.todos.length + p.items.length;
+    var pdone = dt + di;
+    var ppct = ptotal ? Math.round(pdone/ptotal*100) : 0;
+
+    var thtml = p.todos.map(function(t,ti){
+      return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+pi+','+ti+',false)">'+
+        '<div class="cbox">'+(t.done?chk():'')+'</div>'+
+        '<div style="flex:1"><div class="ct2">'+t.text+'</div>'+
+        (t.doneBy?'<div class="who">Klar av '+t.doneBy+' '+t.doneAt+'</div>':'')+
+        '</div></div>';
+    }).join('');
+
+    var ihtml = p.items.map(function(t,ti){
+      return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+pi+','+ti+',true)">'+
+        '<div class="cb2">'+(t.done?chk():'')+'</div>'+
+        '<div style="flex:1"><div class="ct2">'+t.text+'</div>'+
+        (t.doneBy?'<div class="who">Köpt av '+t.doneBy+' '+t.doneAt+'</div>':'')+
+        '</div></div>';
+    }).join('');
+
+    return '<div class="card">'+
+      '<div class="ch"><div class="ct">'+p.name+'</div>'+
+      '<span class="'+(ppct===100?'badge-green':'badge-gray')+'">'+ppct+'%</span></div>'+
+      '<div class="cb" style="padding:10px 14px">'+
+      (p.desc?'<p style="font-size:.85rem;color:var(--ink2);margin-bottom:12px;line-height:1.5">'+p.desc+'</p>':'')+
+      (p.todos.length?'<div class="cl-head">Att göra</div>'+thtml:'')+
+      (p.items.length?'<div class="cl-head">Inköp</div>'+ihtml:'')+
+      '</div></div>';
+  }).join('');
+
+  // Extras
+  var es = document.getElementById('extras-section');
+  if(d.extras.length) {
+    es.innerHTML = '<div class="card"><div class="ch"><div class="ct">Glöm inte</div></div><div class="cb" style="padding:10px 14px">'+
+      d.extras.map(function(e,i){
+        return '<div class="ci'+(e.done?' done':'')+'" onclick="toggleExtra('+i+')">'+
+          '<div class="cbox">'+(e.done?chk():'')+'</div>'+
+          '<div style="flex:1"><div class="ct2">'+e.text+'</div>'+
+          (e.doneBy?'<div class="who">Av '+e.doneBy+' '+e.doneAt+'</div>':'')+
+          '</div></div>';
+      }).join('')+'</div></div>';
+  } else {
+    es.innerHTML = '';
+  }
+
+  // Kommentarer
+  var cl = document.getElementById('comments-list');
+  if(d.comments.length) {
+    cl.innerHTML = d.comments.map(function(c){
+      return '<div style="background:var(--c);border-radius:8px;padding:10px 12px;margin-bottom:8px">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+        '<div class="avatar">'+c.name.charAt(0).toUpperCase()+'</div>'+
+        '<span style="font-weight:500;font-size:.87rem">'+c.name+'</span>'+
+        '<span style="color:var(--ink3);font-size:.75rem;margin-left:auto">'+c.time+'</span>'+
+        '</div>'+
+        '<div style="font-size:.87rem;line-height:1.55;color:var(--ink2)">'+c.text+'</div>'+
+        '</div>';
+    }).join('');
+  } else {
+    cl.innerHTML = '<div style="color:var(--ink3);font-size:.84rem;margin-bottom:8px">Inga kommentarer ännu – skriv det första!</div>';
+  }
+}
+
+// Fyll i uppdragsnamn i välkomstrutan om vi kan
+window.addEventListener('load', function(){
+  var d = loadSharedData();
+  if(d && d.name) {
+    document.getElementById('name-mission-title').textContent = 'Du är inbjuden till "'+d.name+'". Skriv ditt namn för att fortsätta.';
+  }
+  var m = findMissionByToken(TOKEN);
+  if(m && m.name) {
+    document.getElementById('name-mission-title').textContent = 'Du är inbjuden till "'+m.name+'". Skriv ditt namn för att fortsätta.';
+  }
+  document.getElementById('participant-name').focus();
+  document.getElementById('participant-name').addEventListener('keydown', function(e){
+    if(e.key==='Enter') joinMission();
+  });
+});
+</script>
+</body>
+</html>
