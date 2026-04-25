@@ -156,46 +156,62 @@ tr:hover td{background:#f9f9f6}
 .empty-state p{font-size:.88rem;margin-bottom:14px}
 /* MOBILE ─────────────────────────────────────────*/
 @media(max-width:600px){
-  header{height:auto;padding:10px 14px;flex-wrap:wrap;gap:8px}
-  .logo{font-size:1.1rem}
+  header{height:auto;padding:8px 12px;flex-wrap:wrap;gap:6px}
+  .logo{font-size:1rem}
   .logo em{display:none}
-  .hbtns{gap:5px;flex-wrap:wrap}
-  .hbtn{padding:5px 10px;font-size:.75rem}
+  .hbtns{gap:4px;flex-wrap:wrap}
+  .hbtn{padding:5px 9px;font-size:.72rem}
   #btn-print{display:none}
-  #drive-sync-bar{padding:6px 14px;font-size:.76rem}
-  nav{padding:0 10px}
-  .ntab{padding:9px 10px;font-size:.8rem}
-  main{padding:12px}
-  .ptitle{font-size:1.3rem}
-  .kpis{grid-template-columns:1fr 1fr;gap:8px}
-  .kpi{padding:11px 12px}
-  .kv{font-size:1.2rem}
-  .tiles{grid-template-columns:1fr 1fr;gap:8px}
-  .tile{padding:12px}
-  .tile-t{font-size:.9rem}
-  /* Projektkortet – enkolumns på mobil */
-  .pc-body{grid-template-columns:1fr}
-  .pc-left{border-right:none;border-bottom:1px solid var(--s)}
-  .pc-btns{flex-direction:row;flex-wrap:wrap}
-  .pc-btns .btn{flex:1;text-align:center;font-size:.8rem}
-  /* Tabeller – scrolla horisontellt */
+  #drive-sync-bar{padding:5px 12px;font-size:.72rem}
+  nav{padding:0 8px}
+  .ntab{padding:8px 9px;font-size:.76rem;gap:3px}
+  .dot{width:5px;height:5px}
+  main{padding:10px}
+  .ptitle{font-size:1.2rem}
+  /* KPI – 2 kolumner */
+  #kpi-row{grid-template-columns:1fr 1fr!important;gap:6px}
+  .kpi{padding:10px 10px}
+  .kv{font-size:1.1rem}
+  .kl{font-size:.68rem}
+  /* Startsida – listor staplas */
+  #sec-hem>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  /* Snabblänkar – 4 kolumner behålls men kompaktare */
+  #sec-hem>div[style*="repeat(4,1fr)"]{grid-template-columns:repeat(4,1fr)!important;gap:5px}
+  .tile{padding:8px!important}
+  .tile div[style*="font-weight:500"]{font-size:.75rem!important}
+  /* Projektkort – enkolumns */
+  .pc-body{grid-template-columns:1fr!important}
+  .pc-left{border-right:none!important;border-bottom:1px solid var(--s)}
+  .pc-btns{flex-direction:column!important}
+  .pc-btns .btn{width:100%;text-align:center;font-size:.83rem}
+  .pc-stats{grid-template-columns:1fr 1fr}
+  /* Tabeller – scrolla */
   .card{overflow-x:auto}
-  table{min-width:480px}
-  /* Modaler – full bredd */
-  .ov{padding:0;align-items:flex-end}
-  .modal{border-radius:var(--r) var(--r) 0 0;max-width:100%;max-height:90vh;overflow-y:auto}
+  table{min-width:440px}
+  /* Modaler – glider upp nedifrån */
+  .ov{padding:0!important;align-items:flex-end!important}
+  .modal{border-radius:16px 16px 0 0!important;max-width:100%!important;max-height:92vh;overflow-y:auto}
   /* Formulär */
-  .fg{grid-template-columns:1fr}
-  .acts{gap:6px}
-  .btn{padding:9px 14px;font-size:.85rem}
-  .btn.pri{padding:11px 16px}
-  /* Mission card */
-  .mc-head{padding:10px 14px}
-  .mc-body{padding:12px 14px}
+  .fg{grid-template-columns:1fr!important}
+  .acts{gap:6px;flex-wrap:wrap}
+  .btn{padding:10px 14px;font-size:.85rem}
+  .btn.pri{padding:12px 16px}
+  /* Uppdragskort */
+  .mc-head{padding:10px 12px}
+  .mc-body{padding:10px 12px}
+  .mc-title{font-size:.95rem}
+  /* Väder */
+  #weather-row{grid-template-columns:repeat(3,1fr)!important}
+  /* Kalender */
+  .cal-day{min-height:38px}
+  .cal-event{font-size:.6rem}
+  /* Bildgalleri */
+  #image-gallery{grid-template-columns:repeat(2,1fr)!important}
 }
 @media(max-width:380px){
-  .tiles{grid-template-columns:1fr}
-  .kpis{grid-template-columns:1fr 1fr}
+  .hbtn{font-size:.68rem;padding:4px 7px}
+  .ntab{font-size:.7rem;padding:7px 7px}
+  #sec-hem>div[style*="repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
 }
 
 /* PRINT */
@@ -2363,35 +2379,51 @@ function showShareModal(m, url, subject, body) {
   var existing = document.getElementById('ov-share-mission');
   if(existing) existing.remove();
 
+  var participantList = (m.participants&&m.participants.length) ?
+    '<div class="fr" style="margin-top:12px"><div class="fl">Har öppnat länken</div>'+
+    '<div style="display:flex;flex-direction:column;gap:4px">'+
+    m.participants.map(function(p){
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--c);border-radius:6px;font-size:.85rem">'+
+        '<div style="width:26px;height:26px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:500;color:#1A4D2E;font-size:.78rem">'+p.name.charAt(0).toUpperCase()+'</div>'+
+        p.name+'<span style="color:var(--ink3);font-size:.75rem;margin-left:auto">'+p.joined+'</span></div>';
+    }).join('')+
+    '</div></div>' : '';
+
   var modal = document.createElement('div');
   modal.className = 'ov on';
   modal.id = 'ov-share-mission';
   modal.innerHTML = '<div class="modal" style="max-width:520px">'+
-    '<div class="mh"><div class="mh-t">Dela uppdrag – '+m.name+'</div><button class="mx" onclick="document.getElementById(\'ov-share-mission\').remove()">×</button></div>'+
+    '<div class="mh"><div class="mh-t">Dela uppdrag</div><button class="mx" onclick="document.getElementById(\'ov-share-mission\').remove()">×</button></div>'+
     '<div class="mb">'+
-    '<div class="info" style="margin-bottom:14px">Deltagarna öppnar länken, skriver sitt namn och kan bocka av uppgifter. De ser bara detta uppdrag – inte ekonomi eller annan info.</div>'+
-    '<div class="fr"><div class="fl">Delningslänk</div>'+
-    '<div style="display:flex;gap:6px">'+
-    '<input class="fi" type="text" value="'+url+'" id="share-url-input" readonly style="flex:1;font-size:.8rem;font-family:monospace">'+
-    '<button class="btn pri" onclick="copyShareUrl()">Kopiera</button>'+
-    '</div></div>'+
-    '<div class="fr" style="margin-top:8px"><div class="fl">Öppna i mailprogram</div>'+
-    '<a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" class="btn pri" style="display:inline-block;text-decoration:none;text-align:center">Öppna mail med länk</a>'+
+    '<div style="font-weight:500;font-size:.95rem;margin-bottom:4px">'+m.name+'</div>'+
+    (m.date?'<div style="font-size:.82rem;color:var(--ink3);margin-bottom:14px">'+m.date+'</div>':'')+
+    '<div class="info" style="margin-bottom:14px">Deltagarna klickar på länken, skriver sitt namn och bockar av uppgifter. De ser bara detta uppdrag.</div>'+
+
+    '<div class="fr"><div class="fl">Mailadresser (separera med komma)</div>'+
+    '<input class="fi" type="text" id="share-emails" placeholder="erik@mail.com, anna@mail.com">'+
     '</div>'+
-    (m.participants&&m.participants.length?
-      '<div class="fr" style="margin-top:8px"><div class="fl">Deltagare som öppnat länken</div>'+
-      '<div style="display:flex;flex-direction:column;gap:4px">'+
-      m.participants.map(function(p){return '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--c);border-radius:6px;font-size:.85rem">'+
-        '<div style="width:28px;height:28px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:500;color:#1A4D2E;font-size:.8rem">'+p.name.charAt(0).toUpperCase()+'</div>'+
-        p.name + '<span style="color:var(--ink3);font-size:.75rem;margin-left:auto">'+p.joined+'</span>'+
-        '</div>';}).join('')+
-      '</div></div>' : '')+
+
+    '<div style="margin-top:10px;margin-bottom:14px">'+
+    '<a id="share-mail-btn" href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" class="btn pri" style="display:block;text-align:center;text-decoration:none;padding:12px" onclick="updateMailLink(this,\''+encodeURIComponent(subject)+'\',\''+encodeURIComponent(body)+'\')">📧 Öppna mail och skicka</a>'+
+    '</div>'+
+
+    '<div class="fr"><div class="fl">Eller kopiera länken och dela manuellt</div>'+
+    '<div style="display:flex;gap:6px">'+
+    '<input class="fi" type="text" value="'+url+'" id="share-url-input" readonly style="font-size:.78rem;font-family:monospace">'+
+    '<button class="btn" onclick="copyShareUrl()">Kopiera</button>'+
+    '</div></div>'+
+    participantList+
     '</div>'+
     '<div class="mf"><button class="btn" onclick="document.getElementById(\'ov-share-mission\').remove()">Stäng</button></div>'+
     '</div>';
 
   modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
   document.body.appendChild(modal);
+}
+
+function updateMailLink(el, subject, body) {
+  var emails = document.getElementById('share-emails').value.trim();
+  el.href = 'mailto:'+emails+'?subject='+subject+'&body='+body;
 }
 
 function copyShareUrl() {
