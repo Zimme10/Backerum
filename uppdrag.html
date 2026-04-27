@@ -8,327 +8,257 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--g:#1A4D2E;--gm:#2D7A4F;--gp:#EAF3DE;--s:#E8E8DC;--c:#FAFAF5;--ink:#1C1C1A;--ink2:#4A4A44;--ink3:#8A8A80;--ap:#FDF3E0;--r:10px;--rs:6px}
-body{font-family:'DM Sans',sans-serif;background:var(--c);color:var(--ink);min-height:100vh}
-header{background:var(--g);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+body{font-family:'DM Sans',sans-serif;background:var(--c);color:var(--ink);min-height:100vh;padding-bottom:40px}
+header{background:var(--g);color:#fff;padding:14px 20px}
 .logo{font-family:'Playfair Display',serif;font-size:1.2rem}
 .logo em{font-style:normal;opacity:.5;font-size:.82rem;font-family:'DM Sans',sans-serif;margin-left:6px;font-weight:300}
-main{padding:16px;max-width:700px;margin:0 auto}
+main{padding:16px;max-width:680px;margin:0 auto}
 .card{background:#fff;border:1px solid var(--s);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
 .ch{padding:12px 16px;border-bottom:1px solid var(--s);display:flex;align-items:center;justify-content:space-between}
 .ct{font-weight:500;font-size:.95rem}
 .cb{padding:14px 16px}
-.btn{padding:8px 18px;border-radius:20px;border:1px solid var(--s);background:#fff;color:var(--ink);font-size:.85rem;cursor:pointer;font-family:inherit;display:inline-block;text-decoration:none;text-align:center}
+.btn{padding:10px 20px;border-radius:20px;border:1px solid var(--s);background:#fff;color:var(--ink);font-size:.88rem;cursor:pointer;font-family:inherit;display:inline-block;text-decoration:none;text-align:center}
 .btn.pri{background:var(--g);color:#fff;border-color:var(--g)}
-.btn:hover{opacity:.9}
-.fi,.ft{padding:9px 12px;border:1px solid var(--s);border-radius:var(--rs);font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;outline:none;width:100%}
-.fi:focus,.ft:focus{border-color:var(--g)}
-.ft{min-height:70px;resize:vertical}
+.btn:hover{opacity:.88}
+.fi{padding:10px 12px;border:1px solid var(--s);border-radius:var(--rs);font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;outline:none;width:100%}
+.fi:focus{border-color:var(--g)}
+.ft{padding:10px 12px;border:1px solid var(--s);border-radius:var(--rs);font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;outline:none;width:100%;min-height:80px;resize:vertical}
+.ft:focus{border-color:var(--g)}
 .fr{margin-bottom:12px}
 .fl{font-size:.8rem;font-weight:500;color:var(--ink2);margin-bottom:5px}
 .info{background:var(--gp);border:1px solid #b8ddc2;border-radius:var(--rs);padding:12px 16px;font-size:.84rem;color:#1A4D2E;margin-bottom:12px;line-height:1.55}
 #name-screen{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
 .name-card{background:#fff;border-radius:var(--r);padding:24px;max-width:380px;width:100%}
-.ci{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;border-radius:var(--rs);cursor:pointer;margin-bottom:3px;border:1px solid var(--s)}
+.ci{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;margin-bottom:3px;border:1px solid var(--s);background:#fff}
 .ci:hover{background:var(--c)}
 .ci.done{opacity:.55}
 .ci.done .ct2{text-decoration:line-through}
-.cbox{width:18px;height:18px;border-radius:50%;border:1.5px solid #aaa;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.cbox{width:20px;height:20px;border-radius:50%;border:1.5px solid #aaa;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
 .ci.done .cbox{background:var(--g);border-color:var(--g)}
-.cb2{width:16px;height:16px;border-radius:3px;border:1.5px solid #aaa;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.cb2{width:18px;height:18px;border-radius:3px;border:1.5px solid #aaa;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .ci.done .cb2{background:#D48B2E;border-color:#D48B2E}
-.ct2{flex:1;font-size:.88rem}
-.who{font-size:.72rem;color:var(--ink3);margin-top:1px}
+.ct2{flex:1;font-size:.9rem;line-height:1.5}
+.who{font-size:.72rem;color:var(--ink3);margin-top:2px}
 .prog{height:6px;background:var(--s);border-radius:3px;overflow:hidden;margin-bottom:14px}
 .prog-fill{height:100%;background:#4CAF7D;transition:width .4s}
 .wr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
 .wd{background:var(--c);border-radius:8px;padding:8px 4px;border:1px solid var(--s)}
-.avatar{width:26px;height:26px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:500;color:#1A4D2E;font-size:.78rem;flex-shrink:0}
+.upload-area{border:2px dashed #b8ddc2;border-radius:var(--r);padding:28px 20px;text-align:center;cursor:pointer}
+.upload-area:hover{background:var(--gp)}
+.type-btns{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.type-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--s);background:#fff;font-size:.83rem;cursor:pointer;font-family:inherit}
+.type-btn.on{border-color:var(--g);background:var(--gp);color:#1A4D2E;font-weight:500}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:500;color:#1A4D2E;font-size:.8rem;flex-shrink:0}
 .comment{background:var(--c);border-radius:8px;padding:10px 12px;margin-bottom:8px}
-.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:200}
-.photo-modal.on{display:flex}
-.photo-sheet{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:500px;padding:20px;max-height:90vh;overflow-y:auto}
-.upload-area{border:2px dashed var(--s);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer}
-.upload-area input{display:none}
-.pt-fore{background:#FDF3E0;color:#854F0B;padding:2px 7px;border-radius:10px;font-size:.7rem}
-.pt-after{background:var(--gp);color:#1A4D2E;padding:2px 7px;border-radius:10px;font-size:.7rem}
-.pt-general{background:var(--s);color:var(--ink2);padding:2px 7px;border-radius:10px;font-size:.7rem}
-@media(max-width:480px){.wr{grid-template-columns:repeat(3,1fr)}}
+.success-msg{background:#EAF3DE;border:1px solid #b8ddc2;border-radius:var(--rs);padding:14px 16px;color:#1A4D2E;font-size:.87rem;margin-top:10px;display:none}
 </style>
 </head>
 <body>
 
 <div id="name-screen">
   <div class="name-card">
-    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px">Välkommen till Backerum! 🌿</div>
-    <div style="color:var(--ink3);font-size:.87rem;margin-bottom:18px;line-height:1.5" id="welcome-sub">Du är inbjuden till ett uppdrag. Skriv ditt namn för att fortsätta.</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:8px">Välkommen till Backerum! 🏡</div>
+    <div style="color:var(--ink3);font-size:.87rem;margin-bottom:18px;line-height:1.5" id="name-sub">Du är inbjuden. Skriv ditt namn för att fortsätta.</div>
     <input class="fi" type="text" id="participant-name" placeholder="Ditt namn" style="margin-bottom:12px">
     <button class="btn pri" style="width:100%;padding:12px" onclick="joinMission()">Fortsätt →</button>
   </div>
 </div>
 
-<div class="photo-modal" id="photo-modal">
-  <div class="photo-sheet">
-    <div style="font-weight:500;font-size:1rem;margin-bottom:14px">📸 Lägg till bild</div>
-    <div class="fr"><div class="fl">Bildtitel</div><input class="fi" type="text" id="photo-title" placeholder="t.ex. Uteplatsen, Trädgården..."></div>
-    <div class="fr"><div class="fl">Bildtyp</div>
-      <select class="fi" id="photo-type"><option value="general">Allmän bild</option><option value="fore">Före-bild</option><option value="after">Efter-bild</option></select>
-    </div>
-    <div class="fr"><div class="fl">Projekt (valfritt)</div><select class="fi" id="photo-project"><option value="">Ingen koppling</option></select></div>
-    <div class="fr"><div class="fl">Beskrivning (valfritt)</div><textarea class="ft" id="photo-desc" style="min-height:60px" placeholder="Berätta om bilden..."></textarea></div>
-    <div class="info">Ditt mailprogram öppnas – bifoga bilden/bilderna i mailet innan du skickar!</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" style="flex:1" onclick="closePhotoModal()">Avbryt</button>
-      <button class="btn pri" style="flex:1" onclick="submitPhoto()">Öppna mail 📧</button>
-    </div>
-  </div>
-</div>
-
-<header>
-  <div class="logo">Backerum <em>Sommarstugan</em></div>
-  <div id="header-name" style="font-size:.82rem;opacity:.8"></div>
-</header>
+<header><div class="logo">Backerum <em>Sommarstugan</em></div></header>
 
 <main id="main-content" style="display:none">
   <div style="margin-bottom:16px">
-    <div style="font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:3px" id="mission-title"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:4px" id="mission-title"></div>
     <div style="font-size:.85rem;color:var(--ink3)" id="mission-meta"></div>
   </div>
 
-  <div id="participants-box" style="display:none;margin-bottom:14px">
-    <div style="font-size:.75rem;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Med på helgen</div>
-    <div id="participants-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  <div class="info" id="participant-box" style="display:none"><strong>Deltagare:</strong> <span id="participant-names"></span></div>
+
+  <div id="progress-section" style="display:none;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--ink3);margin-bottom:4px"><span>Framsteg</span><span id="progress-label"></span></div>
+    <div class="prog"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
   </div>
 
-  <!-- VÄDER -->
+  <!-- Väder -->
   <div class="card">
-    <div class="ch"><div class="ct">☀️ Väder – Sankt Anna</div><span id="w-time" style="font-size:.75rem;color:var(--ink3)"></span></div>
-    <div class="cb" style="padding:12px 14px">
-      <div id="w-today" style="display:flex;align-items:center;gap:14px;padding-bottom:10px;border-bottom:1px solid var(--s);margin-bottom:10px">
-        <div style="font-size:2.2rem" id="w-icon"></div>
-        <div><div style="font-size:1.5rem;font-weight:500" id="w-temp"></div><div style="font-size:.82rem;color:var(--ink3)" id="w-desc"></div><div style="font-size:.78rem;color:var(--ink3)" id="w-wind"></div></div>
-        <div style="margin-left:auto;text-align:right"><div style="font-size:.8rem;color:#2E6DA4" id="w-rain"></div><div style="font-size:.75rem;color:var(--ink3)" id="w-minmax"></div></div>
+    <div class="ch"><div class="ct">☀️ Väder – Sankt Anna</div><span style="font-size:.75rem;color:var(--ink3)" id="w-updated"></span></div>
+    <div class="cb" style="padding:10px 12px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--s)">
+        <div style="font-size:2rem" id="w-icon-today"></div>
+        <div><div style="font-size:1.4rem;font-weight:500" id="w-temp-today"></div><div style="font-size:.8rem;color:var(--ink3)" id="w-desc-today"></div></div>
+        <div style="margin-left:auto;text-align:right"><div style="font-size:.78rem;color:#2E6DA4" id="w-rain-today"></div><div style="font-size:.75rem;color:var(--ink3)" id="w-wind-today"></div></div>
       </div>
-      <div class="wr" id="w-next"></div>
+      <div class="wr" id="weather-row"><div style="grid-column:1/-1;text-align:center;color:var(--ink3);font-size:.8rem;padding:6px">Hämtar väder...</div></div>
     </div>
   </div>
 
-  <!-- TA MED -->
-  <div class="card" id="bring-card" style="display:none">
-    <div class="ch"><div class="ct">🎒 Ta med dig</div></div>
-    <div class="cb"><div id="bring-list"></div></div>
-  </div>
+  <div id="projects-section"></div>
+  <div id="extras-section"></div>
 
-  <!-- PROJEKT -->
+  <!-- Bilduppladdning -->
   <div class="card">
-    <div class="ch"><div class="ct">📋 Projekt</div><span id="prog-label" style="font-size:.82rem;color:var(--ink3)"></span></div>
-    <div class="cb" style="padding:10px 16px">
-      <div class="prog"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
-      <div id="proj-list"></div>
+    <div class="ch"><div class="ct">📸 Ladda upp bilder</div></div>
+    <div class="cb">
+      <div class="info">Ladda upp bilder från helgen – märk dem som Före, Efter eller Allmän. Bilderna skickas direkt till Backerum-mailet!</div>
+      <form id="photo-form" action="https://formspree.io/f/mrerwzng" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" id="form-subject" value="Nya bilder från Backerum">
+        <input type="hidden" name="Uppdrag" id="form-mission">
+        <input type="hidden" name="Namn" id="form-name">
+        <div class="fr">
+          <div class="fl">Typ av bild</div>
+          <div class="type-btns">
+            <button type="button" class="type-btn on" onclick="setType(this,'Allmän')">📷 Allmän</button>
+            <button type="button" class="type-btn" onclick="setType(this,'Före')">⬅️ Före</button>
+            <button type="button" class="type-btn" onclick="setType(this,'Efter')">✅ Efter</button>
+          </div>
+          <input type="hidden" name="Bildtyp" id="form-type" value="Allmän">
+        </div>
+        <div class="fr">
+          <div class="fl">Välj bild(er)</div>
+          <div class="upload-area" onclick="document.getElementById('file-input').click()">
+            <div style="font-size:2rem;margin-bottom:6px">📎</div>
+            <div style="font-weight:500;margin-bottom:3px">Tryck för att välja bilder</div>
+            <div style="font-size:.8rem;color:var(--ink3)">JPG, PNG eller HEIC – max 10MB per bild</div>
+            <input type="file" id="file-input" name="Bilder" multiple accept="image/*" style="display:none" onchange="showFiles(this)">
+          </div>
+          <div id="file-list" style="margin-top:6px;font-size:.82rem;color:var(--g)"></div>
+        </div>
+        <div class="fr"><div class="fl">Projekt (valfritt)</div><input class="fi" type="text" name="Projekt" placeholder="t.ex. Stenlagd uteplats"></div>
+        <div class="fr"><div class="fl">Beskrivning (valfritt)</div><textarea class="ft" name="Beskrivning" placeholder="Vad händer på bilden?"></textarea></div>
+        <button type="submit" class="btn pri" style="width:100%;padding:13px">📤 Skicka bilder</button>
+        <div class="success-msg" id="upload-success">✅ Skickat! Bilderna dyker upp i Backerum-mailet inom kort.</div>
+      </form>
     </div>
   </div>
 
-  <!-- GLÖM INTE -->
-  <div class="card" id="extras-card" style="display:none">
-    <div class="ch"><div class="ct">📌 Glöm inte</div></div>
-    <div class="cb"><div id="extras-list"></div></div>
-  </div>
-
-  <!-- BILDER -->
+  <!-- Kommentarer -->
   <div class="card">
-    <div class="ch"><div class="ct">📸 Bilder</div><button class="btn pri" style="font-size:.8rem;padding:5px 12px" onclick="openPhotoModal()">+ Lägg till</button></div>
+    <div class="ch"><div class="ct">💬 Meddelanden</div></div>
     <div class="cb">
-      <div class="info">Klicka för att lägga till bild – ditt mailprogram öppnas och du bifogar bilden och skickar till backerum-mailet.</div>
-      <div id="photo-list"></div>
-      <label class="upload-area" style="margin-top:10px;display:block">
-        <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles()">
-        <div style="font-size:1.6rem;margin-bottom:4px">📷</div>
-        <div style="font-size:.85rem;font-weight:500">Tryck för att välja bild</div>
-        <div style="font-size:.78rem;color:var(--ink3);margin-top:2px">Öppnar mailprogrammet</div>
-      </label>
+      <div id="comments-list"></div>
+      <textarea class="ft" id="comment-input" placeholder="Skriv ett meddelande till gruppen..." style="margin-bottom:8px"></textarea>
+      <button class="btn pri" style="width:100%" onclick="addComment()">Skicka meddelande</button>
     </div>
   </div>
-
-  <!-- KOMMENTARER -->
-  <div class="card">
-    <div class="ch"><div class="ct">💬 Kommentarer</div></div>
-    <div class="cb">
-      <div id="comments-list" style="margin-bottom:12px"></div>
-      <textarea class="ft" id="comment-input" placeholder="Skriv ett meddelande..."></textarea>
-      <button class="btn pri" style="margin-top:8px;width:100%" onclick="addComment()">Skicka</button>
-    </div>
-  </div>
-
-  <!-- TACKMÄLL -->
-  <div class="card" id="thankyou-card" style="display:none">
-    <div class="ch"><div class="ct">📨 Skicka tackmäll</div></div>
-    <div class="cb">
-      <p style="font-size:.86rem;color:var(--ink2);margin-bottom:12px;line-height:1.55">Genererar ett tackmäll med summering av helgen, deltagare och bilder.</p>
-      <button class="btn pri" onclick="sendThankYouMail()">Skapa tackmäll →</button>
-    </div>
-  </div>
-
 </main>
 
 <script>
+var FORMSPREE='https://formspree.io/f/mrerwzng';
 var TOKEN=new URLSearchParams(window.location.search).get('id')||'';
 var MY_NAME='';
-var SHARE_KEY='br_share_';
-var MAIL='backerum1@gmail.com';
-var sharedData=null;
-var WMO={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',80:'🌦️',81:'🌧️',95:'⛈️'};
-var WMOT={0:'Klart',1:'Mest klart',2:'Halvklart',3:'Mulet',45:'Dimma',51:'Lätt regn',53:'Duggregn',61:'Lätt regn',63:'Regn',65:'Kraftigt regn',71:'Snö',80:'Regnskurar',95:'Åska'};
+var SD=null;
+var WMO={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',61:'🌧️',71:'❄️',80:'🌦️',95:'⛈️'};
+var WMO_T={0:'Klart',1:'Mest klart',2:'Halvklart',3:'Mulet',45:'Dimma',51:'Duggregn',61:'Regn',71:'Snö',80:'Skurar',95:'Åska'};
 var DAYS=['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
 
-if(!TOKEN){document.getElementById('name-screen').innerHTML='<div class="name-card"><div style="font-family:Playfair Display,serif;font-size:1.2rem;margin-bottom:8px">Ogiltig länk</div><div style="color:var(--ink3)">Kontakta Simon eller Frida för en ny länk.</div></div>';}
+if(!TOKEN){document.getElementById('name-screen').innerHTML='<div class="name-card"><div style="font-size:1.2rem;font-weight:500;margin-bottom:8px">Ogiltig länk</div><div style="color:var(--ink3)">Kontakta värden för en ny länk.</div></div>';}
 
-function ld(){try{var r=localStorage.getItem(SHARE_KEY+TOKEN);if(r)return JSON.parse(r);}catch(e){}return null;}
-function sd(d){try{localStorage.setItem(SHARE_KEY+TOKEN,JSON.stringify(d));}catch(e){}}
-function fm(){try{var ms=JSON.parse(localStorage.getItem('br_missions')||'[]');return ms.find(function(m){return m.shareToken===TOKEN;});}catch(e){return null;}}
-function gp(ids){try{var ps=JSON.parse(localStorage.getItem('br_projects')||'[]');return ps.filter(function(p){return ids.includes(p.id);});}catch(e){return[];}}
+function loadSD(){try{var r=localStorage.getItem('br_share_'+TOKEN);return r?JSON.parse(r):null;}catch(e){return null;}}
+function saveSD(){try{localStorage.setItem('br_share_'+TOKEN,JSON.stringify(SD));}catch(e){}}
+function findMission(){try{return(JSON.parse(localStorage.getItem('br_missions')||'[]')).find(function(m){return m.shareToken===TOKEN;});}catch(e){return null;}}
+function findProjects(ids){try{return(JSON.parse(localStorage.getItem('br_projects')||'[]')).filter(function(p){return ids.includes(p.id);});}catch(e){return[];}}
 
 function joinMission(){
   var name=document.getElementById('participant-name').value.trim();
   if(!name){alert('Ange ditt namn');return;}
   MY_NAME=name;
-  sharedData=ld();
-  if(!sharedData){
-    var m=fm();
-    if(!m){document.getElementById('name-screen').innerHTML='<div class="name-card"><div style="font-family:Playfair Display,serif;font-size:1.2rem;margin-bottom:8px">Hoppsan</div><div style="color:var(--ink3)">Uppdraget hittades inte. Kontakta Simon eller Frida.</div></div>';return;}
-    var mps=gp(m.projectIds);
-    sharedData={token:TOKEN,name:m.name,date:m.date||'',people:m.people||'',bring:m.bring||[],
-      projects:mps.map(function(p){return{id:p.id,name:p.name,cat:p.cat,desc:p.desc,
-        todos:p.todos.map(function(t){return{text:t.text,done:t.done,doneBy:'',doneAt:''};}),
+  SD=loadSD();
+  if(!SD){
+    var m=findMission();
+    if(!m){document.getElementById('name-screen').innerHTML='<div class="name-card"><div style="font-size:1.1rem;font-weight:500;margin-bottom:8px">Hoppsan</div><div style="color:var(--ink3)">Uppdraget hittades inte. Öppna länken igen från mailet.</div></div>';return;}
+    var ps=findProjects(m.projectIds||[]);
+    SD={token:TOKEN,missionId:m.id,name:m.name,date:m.date||'',people:m.people||'',
+      projects:ps.map(function(p){return{id:p.id,name:p.name,cat:p.cat,desc:p.desc,
+        todos:p.todos.map(function(t){return{text:t.text,done:t.done,doneBy:'',doneAt:''};},),
         items:p.items.map(function(t){return{text:t.text,done:t.done,doneBy:'',doneAt:''};})
       };}),
-      extras:(m.extras||[]).map(function(e){return{text:e.text,done:e.done,doneBy:''};}),
-      participants:[],comments:[],photos:[]};
-    sd(sharedData);
+      extras:(m.extras||[]).map(function(e){return{text:e.text,done:e.done,doneBy:'',doneAt:''};},),
+      participants:[],comments:[]};
+    saveSD();
   }
-  var ex=sharedData.participants.find(function(p){return p.name.toLowerCase()===name.toLowerCase();});
-  if(!ex){sharedData.participants.push({name:name,joined:new Date().toLocaleDateString('sv-SE')});sd(sharedData);updateMain(name);}
+  if(!SD.participants.find(function(p){return p.name.toLowerCase()===name.toLowerCase();})){
+    SD.participants.push({name:name,joined:new Date().toLocaleDateString('sv-SE')});
+    saveSD();
+    try{var ms=JSON.parse(localStorage.getItem('br_missions')||'[]');var m2=ms.find(function(x){return x.shareToken===TOKEN;});if(m2){if(!m2.participants)m2.participants=[];if(!m2.participants.find(function(p){return p.name.toLowerCase()===name.toLowerCase();}))m2.participants.push({name:name,joined:new Date().toLocaleDateString('sv-SE')});localStorage.setItem('br_missions',JSON.stringify(ms));}}catch(e){}
+  }
+  document.getElementById('form-name').value=name;
+  document.getElementById('form-mission').value=SD.name;
+  document.getElementById('form-subject').value='Bilder från uppdrag: '+SD.name;
   document.getElementById('name-screen').style.display='none';
   document.getElementById('main-content').style.display='block';
-  document.getElementById('header-name').textContent=name;
-  if(['simon','frida'].includes(name.toLowerCase()))document.getElementById('thankyou-card').style.display='block';
   fetchWeather();render();
 }
 
-function updateMain(name){
-  try{var ms=JSON.parse(localStorage.getItem('br_missions')||'[]');var m=ms.find(function(x){return x.shareToken===TOKEN;});if(m){if(!m.participants)m.participants=[];var ex=m.participants.find(function(p){return p.name.toLowerCase()===name.toLowerCase();});if(!ex)m.participants.push({name:name,joined:new Date().toLocaleDateString('sv-SE')});localStorage.setItem('br_missions',JSON.stringify(ms));}}catch(e){}}
+document.getElementById('photo-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  var btn=this.querySelector('button[type=submit]');
+  btn.textContent='Skickar...';btn.disabled=true;
+  fetch(FORMSPREE,{method:'POST',body:new FormData(this),headers:{'Accept':'application/json'}})
+    .then(function(r){return r.json();})
+    .then(function(){
+      document.getElementById('upload-success').style.display='block';
+      document.getElementById('file-list').textContent='';
+      document.getElementById('file-input').value='';
+      btn.textContent='📤 Skicka bilder';btn.disabled=false;
+    }).catch(function(){alert('Något gick fel – försök igen.');btn.textContent='📤 Skicka bilder';btn.disabled=false;});
+});
 
-function chk(){return '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';}
+function setType(el,val){document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');document.getElementById('form-type').value=val;}
+function showFiles(input){var n=Array.from(input.files).map(function(f){return f.name;}).join(', ');document.getElementById('file-list').textContent=n?'Vald: '+n:'';document.getElementById('upload-success').style.display='none';}
+function chk(){return '<svg width="11" height="11" viewBox="0 0 11 11"><path d="M2 5.5l2.5 2.5L9 3" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>';}
 
-function toggleTodo(pi,ti,isBuy){var arr=isBuy?sharedData.projects[pi].items:sharedData.projects[pi].todos;arr[ti].done=!arr[ti].done;arr[ti].doneBy=arr[ti].done?MY_NAME:'';arr[ti].doneAt=arr[ti].done?new Date().toLocaleDateString('sv-SE'):'';sd(sharedData);render();}
-function toggleExtra(i){sharedData.extras[i].done=!sharedData.extras[i].done;sharedData.extras[i].doneBy=sharedData.extras[i].done?MY_NAME:'';sd(sharedData);render();}
-function toggleBring(i){if(!sharedData.bring[i])return;sharedData.bring[i].done=!sharedData.bring[i].done;sd(sharedData);render();}
-function addComment(){var txt=document.getElementById('comment-input').value.trim();if(!txt)return;sharedData.comments.push({name:MY_NAME,text:txt,time:new Date().toLocaleString('sv-SE')});sd(sharedData);document.getElementById('comment-input').value='';render();}
+function toggleTodo(pi,ti,isBuy){
+  var p=SD.projects[pi];var arr=isBuy?p.items:p.todos;
+  arr[ti].done=!arr[ti].done;arr[ti].doneBy=arr[ti].done?MY_NAME:'';arr[ti].doneAt=arr[ti].done?new Date().toLocaleDateString('sv-SE'):'';
+  try{var ps=JSON.parse(localStorage.getItem('br_projects')||'[]');var mp=ps.find(function(x){return x.id===p.id;});if(mp){var a2=isBuy?mp.items:mp.todos;if(a2[ti])a2[ti].done=arr[ti].done;var t=mp.todos.length+mp.items.length;var d=mp.todos.filter(function(x){return x.done;}).length+mp.items.filter(function(x){return x.done;}).length;mp.progress=t?Math.round(d/t*100):0;localStorage.setItem('br_projects',JSON.stringify(ps));}}catch(e){}
+  saveSD();render();
+}
+function toggleExtra(i){SD.extras[i].done=!SD.extras[i].done;SD.extras[i].doneBy=SD.extras[i].done?MY_NAME:'';SD.extras[i].doneAt=SD.extras[i].done?new Date().toLocaleDateString('sv-SE'):'';saveSD();render();}
+function addComment(){var txt=document.getElementById('comment-input').value.trim();if(!txt)return;SD.comments.push({name:MY_NAME,text:txt,time:new Date().toLocaleString('sv-SE')});saveSD();document.getElementById('comment-input').value='';render();}
 
 function render(){
-  var d=sharedData;
+  var d=SD;
   document.getElementById('mission-title').textContent=d.name;
-  document.getElementById('mission-meta').textContent=[d.date,d.people].filter(Boolean).join(' · ');
+  document.getElementById('mission-meta').textContent=(d.date?d.date+' · ':'')+(d.people||'');
   document.title='Backerum – '+d.name;
-  if(d.participants.length){
-    document.getElementById('participants-box').style.display='block';
-    document.getElementById('participants-list').innerHTML=d.participants.map(function(p){return '<div style="display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--s);border-radius:20px;padding:4px 10px;font-size:.82rem"><div class="avatar" style="width:22px;height:22px;font-size:.7rem">'+p.name.charAt(0).toUpperCase()+'</div>'+p.name+'</div>';}).join('');
-  }
-  var tot=0,don=0;
-  d.projects.forEach(function(p){tot+=p.todos.length+p.items.length;don+=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;});
-  tot+=d.extras.length;don+=d.extras.filter(function(e){return e.done;}).length;
-  var pct=tot?Math.round(don/tot*100):0;
-  document.getElementById('prog-label').textContent=don+'/'+tot+' klara ('+pct+'%)';
-  document.getElementById('prog-fill').style.width=pct+'%';
-  document.getElementById('proj-list').innerHTML=d.projects.map(function(p,pi){
-    var pd=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;
-    var pt=p.todos.length+p.items.length;var pp=pt?Math.round(pd/pt*100):0;
-    return '<div style="border:1px solid var(--s);border-radius:8px;margin-bottom:10px;overflow:hidden">'+
-      '<div style="padding:8px 12px;background:'+(pp===100?'var(--gp)':'var(--c)')+';display:flex;align-items:center;justify-content:space-between"><div style="font-weight:500;font-size:.92rem">'+p.name+'</div><span style="font-size:.8rem;color:'+(pp===100?'#1A4D2E':'var(--ink3)')+';font-weight:500">'+pp+'%</span></div>'+
-      (p.desc?'<div style="padding:6px 12px;font-size:.83rem;color:var(--ink3)">'+p.desc+'</div>':'')+
-      '<div style="padding:6px 12px">'+
-      p.todos.map(function(t,ti){return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+pi+','+ti+',false)"><div class="cbox">'+(t.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+t.text+'</div>'+(t.doneBy?'<div class="who">✓ '+t.doneBy+'</div>':'')+'</div></div>';}).join('')+
-      p.items.map(function(t,ti){return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+pi+','+ti+',true)"><div class="cb2">'+(t.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+t.text+'</div>'+(t.doneBy?'<div class="who">✓ '+t.doneBy+'</div>':'')+'</div></div>';}).join('')+
-      '</div></div>';
+  if(d.participants.length){document.getElementById('participant-box').style.display='block';document.getElementById('participant-names').textContent=d.participants.map(function(p){return p.name;}).join(', ');}
+  var tot=0,done=0;
+  d.projects.forEach(function(p){tot+=p.todos.length+p.items.length;done+=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;});
+  tot+=d.extras.length;done+=d.extras.filter(function(e){return e.done;}).length;
+  if(tot>0){document.getElementById('progress-section').style.display='block';var pct=Math.round(done/tot*100);document.getElementById('progress-label').textContent=done+'/'+tot+' klara ('+pct+'%)';document.getElementById('prog-fill').style.width=pct+'%';}
+  var ps=document.getElementById('projects-section');
+  ps.innerHTML=d.projects.map(function(p,pi){
+    var dt=p.todos.filter(function(t){return t.done;}).length;var di=p.items.filter(function(t){return t.done;}).length;
+    var ptot=p.todos.length+p.items.length;var ppct=ptot?Math.round((dt+di)/ptot*100):0;
+    var th=p.todos.map(function(t,ti){return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+pi+','+ti+',false)"><div class="cbox">'+(t.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+t.text+'</div>'+(t.doneBy?'<div class="who">Klar av '+t.doneBy+'</div>':'')+' </div></div>';}).join('');
+    var ih=p.items.map(function(t,ti){return '<div class="ci'+(t.done?' done':'')+'" onclick="toggleTodo('+pi+','+ti+',true)"><div class="cb2">'+(t.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+t.text+'</div>'+(t.doneBy?'<div class="who">Köpt av '+t.doneBy+'</div>':'')+' </div></div>';}).join('');
+    return '<div class="card"><div class="ch"><div class="ct">'+p.name+'</div><span style="background:'+(ppct===100?'var(--gp)':'var(--s)')+';color:'+(ppct===100?'#1A4D2E':'var(--ink3)')+';padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:500">'+ppct+'%</span></div>'+(ppct>0?'<div class="prog" style="margin:0"><div class="prog-fill" style="width:'+ppct+'%"></div></div>':'')+'<div class="cb" style="padding:10px 14px">'+(p.desc?'<p style="font-size:.85rem;color:var(--ink2);margin-bottom:12px;line-height:1.5">'+p.desc+'</p>':'')+(p.todos.length?'<div style="font-size:.72rem;font-weight:500;color:#1A4D2E;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Att göra</div>'+th:'')+(p.items.length?'<div style="font-size:.72rem;font-weight:500;color:#854F0B;text-transform:uppercase;letter-spacing:.05em;margin:'+(p.todos.length?'12':'0')+'px 0 6px">Inköp</div>'+ih:'')+'</div></div>';
   }).join('');
-  if(d.extras.length){document.getElementById('extras-card').style.display='block';document.getElementById('extras-list').innerHTML=d.extras.map(function(e,i){return '<div class="ci'+(e.done?' done':'')+'" onclick="toggleExtra('+i+')"><div class="cbox">'+(e.done?chk():'')+'</div><div class="ct2">'+e.text+'</div></div>';}).join('');}
-  if(d.bring&&d.bring.length){document.getElementById('bring-card').style.display='block';document.getElementById('bring-list').innerHTML=d.bring.map(function(b,i){return '<div class="ci'+(b.done?' done':'')+'" onclick="toggleBring('+i+')"><div class="cbox">'+(b.done?chk():'')+'</div><div class="ct2">'+b.text+'</div></div>';}).join('');}
+  var es=document.getElementById('extras-section');
+  if(d.extras.length){es.innerHTML='<div class="card"><div class="ch"><div class="ct">📋 Glöm inte</div></div><div class="cb" style="padding:10px 14px">'+d.extras.map(function(e,i){return '<div class="ci'+(e.done?' done':'')+'" onclick="toggleExtra('+i+')"><div class="cbox">'+(e.done?chk():'')+'</div><div style="flex:1"><div class="ct2">'+e.text+'</div>'+(e.doneBy?'<div class="who">Av '+e.doneBy+'</div>':'')+' </div></div>';}).join('')+'</div></div>';}
   var cl=document.getElementById('comments-list');
-  cl.innerHTML=d.comments.length?d.comments.map(function(c){return '<div class="comment"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="avatar">'+c.name.charAt(0).toUpperCase()+'</div><span style="font-weight:500;font-size:.87rem">'+c.name+'</span><span style="color:var(--ink3);font-size:.75rem;margin-left:auto">'+c.time+'</span></div><div style="font-size:.87rem;line-height:1.5;color:var(--ink2)">'+c.text+'</div></div>';}).join(''):'<div style="color:var(--ink3);font-size:.84rem;margin-bottom:8px">Inga kommentarer än!</div>';
-  renderPhotos();
-  var sel=document.getElementById('photo-project');
-  sel.innerHTML='<option value="">Ingen koppling</option>'+d.projects.map(function(p){return '<option value="'+p.name+'">'+p.name+'</option>';}).join('');
-}
-
-function handleFiles(){openPhotoModal();}
-function openPhotoModal(){document.getElementById('photo-modal').classList.add('on');}
-function closePhotoModal(){document.getElementById('photo-modal').classList.remove('on');document.getElementById('file-input').value='';}
-
-function submitPhoto(){
-  var title=document.getElementById('photo-title').value.trim()||'Bild från '+MY_NAME;
-  var type=document.getElementById('photo-type').value;
-  var proj=document.getElementById('photo-project').value;
-  var desc=document.getElementById('photo-desc').value.trim();
-  var tl=type==='fore'?'Före-bild':type==='after'?'Efter-bild':'Allmän bild';
-  if(!sharedData.photos)sharedData.photos=[];
-  sharedData.photos.push({title:title,type:type,project:proj,desc:desc,by:MY_NAME,time:new Date().toLocaleDateString('sv-SE'),id:Date.now()});
-  sd(sharedData);
-  var subj='Backerum – '+tl+': '+title+' ('+MY_NAME+')';
-  var body='Hej!\n\n'+MY_NAME+' har lagt till en '+tl.toLowerCase()+' från "'+sharedData.name+'".\n\nBildtitel: '+title+'\n'+(proj?'Projekt: '+proj+'\n':'')+(desc?'Beskrivning: '+desc+'\n':'')+'Tidpunkt: '+new Date().toLocaleString('sv-SE')+'\n\nOBS: Bifoga bilden i mailet innan du skickar!\n\nHälsningar,\n'+MY_NAME;
-  window.location.href='mailto:'+MAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
-  closePhotoModal();renderPhotos();
-  document.getElementById('photo-title').value='';document.getElementById('photo-desc').value='';
-}
-
-function renderPhotos(){
-  var pl=document.getElementById('photo-list');
-  var photos=sharedData.photos||[];
-  if(!photos.length){pl.innerHTML='';return;}
-  pl.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+photos.map(function(p){
-    var tc=p.type==='fore'?'pt-fore':p.type==='after'?'pt-after':'pt-general';
-    var tl=p.type==='fore'?'Före':p.type==='after'?'Efter':'Allmän';
-    return '<div style="border:1px solid var(--s);border-radius:var(--rs);overflow:hidden;background:#fff">'+
-      '<div style="background:var(--s);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:2rem">📷</div>'+
-      '<div style="padding:8px 10px"><div style="font-size:.82rem;font-weight:500">'+p.title+'</div><span class="'+tc+'">'+tl+'</span>'+
-      (p.project?'<div style="font-size:.72rem;color:var(--ink3);margin-top:2px">'+p.project+'</div>':'')+
-      (p.desc?'<div style="font-size:.76rem;color:var(--ink3);margin-top:1px">'+p.desc+'</div>':'')+
-      '<div style="font-size:.7rem;color:var(--ink3);margin-top:3px">'+p.by+' · '+p.time+'</div></div></div>';
-  }).join('')+'</div>';
-}
-
-function sendThankYouMail(){
-  var d=sharedData;
-  var done=d.projects.filter(function(p){var dd=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;var tt=p.todos.length+p.items.length;return tt>0&&dd===tt;});
-  var partial=d.projects.filter(function(p){var dd=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;var tt=p.todos.length+p.items.length;return tt>0&&dd>0&&dd<tt;});
-  var names=d.participants.map(function(p){return p.name;}).join(', ');
-  var photos=d.photos||[];
-  var subj='Tack för en fantastisk helg på Backerum! 🌿';
-  var body='Hej alla!\n\nTack för en underbar helg på Backerum! Ni var fantastiska!\n\n🏡 UPPDRAG: '+d.name+(d.date?' ('+d.date+')':'')+'\n👥 DELTAGARE: '+names+'\n\n';
-  if(done.length)body+='✅ KLARA PROJEKT:\n'+done.map(function(p){return '• '+p.name;}).join('\n')+'\n\n';
-  if(partial.length)body+='🔄 PÅBÖRJADE:\n'+partial.map(function(p){return '• '+p.name;}).join('\n')+'\n\n';
-  if(photos.length)body+='📸 BILDER ('+photos.length+' st):\n'+photos.map(function(p){return '• '+p.title+' ('+(p.type==='fore'?'Före':p.type==='after'?'Efter':'Allmän')+')'+' / '+p.by;}).join('\n')+'\n\n';
-  body+='Vi ses snart igen på Backerum!\n\nVarma hälsningar,\nSimon & Frida ❤️';
-  window.location.href='mailto:?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+  cl.innerHTML=d.comments.length?d.comments.map(function(c){return '<div class="comment"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="avatar">'+c.name.charAt(0).toUpperCase()+'</div><span style="font-weight:500;font-size:.87rem">'+c.name+'</span><span style="color:var(--ink3);font-size:.75rem;margin-left:auto">'+c.time+'</span></div><div style="font-size:.87rem;line-height:1.55">'+c.text+'</div></div>';}).join(''):'<div style="color:var(--ink3);font-size:.84rem;margin-bottom:8px">Inga meddelanden ännu.</div>';
 }
 
 function fetchWeather(){
   fetch('https://api.open-meteo.com/v1/forecast?latitude=58.3443749&longitude=16.6534569&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=Europe%2FStockholm&forecast_days=5')
-    .then(function(r){return r.json();})
-    .then(function(data){
+    .then(function(r){return r.json();}).then(function(data){
       var d=data.daily;
-      document.getElementById('w-icon').textContent=WMO[d.weathercode[0]]||'🌡️';
-      document.getElementById('w-temp').textContent=Math.round(d.temperature_2m_max[0])+'°';
-      document.getElementById('w-desc').textContent=WMOT[d.weathercode[0]]||'';
-      document.getElementById('w-wind').textContent='Vind '+Math.round(d.windspeed_10m_max[0])+' m/s';
-      document.getElementById('w-rain').textContent=d.precipitation_sum[0]>0?Math.round(d.precipitation_sum[0]*10)/10+' mm':'';
-      document.getElementById('w-minmax').textContent=Math.round(d.temperature_2m_min[0])+'° – '+Math.round(d.temperature_2m_max[0])+'°';
-      document.getElementById('w-time').textContent=new Date().toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
-      var html='';for(var i=1;i<5;i++){var dt=new Date(d.time[i]);var dn=i===1?'Imorgon':DAYS[dt.getDay()];html+='<div class="wd"><div style="font-size:.72rem;font-weight:500;color:var(--ink3);margin-bottom:3px">'+dn+'</div><div style="font-size:1.3rem;margin-bottom:1px">'+(WMO[d.weathercode[i]]||'🌡️')+'</div><div style="font-size:.88rem;font-weight:500">'+Math.round(d.temperature_2m_max[i])+'°</div><div style="font-size:.74rem;color:var(--ink3)">'+Math.round(d.temperature_2m_min[i])+'°</div>'+(d.precipitation_sum[i]>0?'<div style="font-size:.68rem;color:#2E6DA4">'+Math.round(d.precipitation_sum[i]*10)/10+'mm</div>':'')+'</div>';}
-      document.getElementById('w-next').innerHTML=html;
+      document.getElementById('w-icon-today').textContent=WMO[d.weathercode[0]]||'🌡️';
+      document.getElementById('w-temp-today').textContent=Math.round(d.temperature_2m_max[0])+'°';
+      document.getElementById('w-desc-today').textContent=WMO_T[d.weathercode[0]]||'';
+      document.getElementById('w-rain-today').textContent=d.precipitation_sum[0]>0?Math.round(d.precipitation_sum[0]*10)/10+' mm':'';
+      document.getElementById('w-wind-today').textContent='Vind '+Math.round(d.windspeed_10m_max[0])+' m/s';
+      document.getElementById('w-updated').textContent=new Date().toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
+      var html='';for(var i=1;i<5;i++){var dt=new Date(d.time[i]);html+='<div class="wd"><div style="font-size:.7rem;font-weight:500;color:var(--ink3);margin-bottom:2px">'+(i===1?'Imorgon':DAYS[dt.getDay()])+'</div><div style="font-size:1.2rem">'+(WMO[d.weathercode[i]]||'🌡️')+'</div><div style="font-size:.83rem;font-weight:500">'+Math.round(d.temperature_2m_max[i])+'°</div><div style="font-size:.72rem;color:var(--ink3)">'+Math.round(d.temperature_2m_min[i])+'°</div>'+(d.precipitation_sum[i]>0?'<div style="font-size:.65rem;color:#2E6DA4">'+Math.round(d.precipitation_sum[i]*10)/10+'mm</div>':'')+'</div>';}
+      document.getElementById('weather-row').innerHTML=html;
     }).catch(function(){});
 }
 
 window.addEventListener('load',function(){
-  var d=ld();var m=fm();var name=(d&&d.name)||(m&&m.name)||'';
-  if(name)document.getElementById('welcome-sub').textContent='Du är inbjuden till "'+name+'"! Skriv ditt namn för att fortsätta.';
+  var d=loadSD();var m=findMission();
+  var name=(d&&d.name)||(m&&m.name)||'';
+  if(name)document.getElementById('name-sub').textContent='Du är inbjuden till "'+name+'". Skriv ditt namn för att fortsätta.';
   document.getElementById('participant-name').focus();
   document.getElementById('participant-name').addEventListener('keydown',function(e){if(e.key==='Enter')joinMission();});
 });
