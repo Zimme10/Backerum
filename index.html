@@ -1107,16 +1107,6 @@ function openModal(name){
   var el=document.getElementById('ov-'+name);
   if(el)el.classList.add('on');
 }
-function closeModal(name){
-  var el=document.getElementById('ov-'+name);
-  if(el)el.classList.remove('on');
-  if(name==='mission'){
-    editingMissionId=null;
-    document.querySelector('#ov-mission .mh-t').textContent='Nytt uppdrag';
-    document.getElementById('btn-save-mission').textContent='Spara uppdrag';
-  }
-}
-
 document.querySelectorAll('.ov').forEach(function(ov){
   ov.addEventListener('click',function(e){
     if(e.target===ov){
@@ -1215,7 +1205,33 @@ document.getElementById('btn-save-proj').addEventListener('click',function(){
   if(!name){alert('Ange projektnamn');return;}
   var todosRaw=document.getElementById('proj-todos').value.split('\n').filter(function(t){return t.trim();});
   var itemsRaw=document.getElementById('proj-items').value.split('\n').filter(function(t){return t.trim();});
-  projects.unshift({id:Date.now(),name:name,cat:document.getElementById('proj-cat').value,budget:parseInt(document.getElementById('proj-budget').value)||0,desc:document.getElementById('proj-desc').value.trim(),todos:todosRaw.map(function(t){return{text:t.trim(),done:false};}),items:itemsRaw.map(function(t){return{text:t.trim(),done:false};}),progress:0,created:new Date().toISOString().slice(0,10)});
+
+  if(editingProjectId){
+    var p=projects.find(function(x){return x.id===editingProjectId;});
+    if(p){
+      p.name=name;
+      p.cat=document.getElementById('proj-cat').value;
+      p.budget=parseInt(document.getElementById('proj-budget').value)||0;
+      p.desc=document.getElementById('proj-desc').value.trim();
+      // Behåll befintliga done-statusar, lägg till nya
+      var existingTodos=p.todos.map(function(t){return t.text;});
+      var existingItems=p.items.map(function(t){return t.text;});
+      p.todos=todosRaw.map(function(t){
+        var ex=p.todos.find(function(x){return x.text===t.trim();});
+        return ex||{text:t.trim(),done:false};
+      });
+      p.items=itemsRaw.map(function(t){
+        var ex=p.items.find(function(x){return x.text===t.trim();});
+        return ex||{text:t.trim(),done:false};
+      });
+      var total=p.todos.length+p.items.length;
+      var done=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;
+      p.progress=total?Math.round(done/total*100):0;
+    }
+    editingProjectId=null;
+  } else {
+    projects.unshift({id:Date.now(),name:name,cat:document.getElementById('proj-cat').value,budget:parseInt(document.getElementById('proj-budget').value)||0,desc:document.getElementById('proj-desc').value.trim(),todos:todosRaw.map(function(t){return{text:t.trim(),done:false};}),items:itemsRaw.map(function(t){return{text:t.trim(),done:false};}),progress:0,created:new Date().toISOString().slice(0,10)});
+  }
   save('projects',projects);
   renderProjects();
   closeModal('proj');
@@ -1287,10 +1303,20 @@ function renderProjects(){
       var pcolor=pct===100?'#1A4D2E':pct>0?'#D48B2E':'#9e9e8e';
 
       var thtml=p.todos.map(function(t,i){
-        return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',false)"><div class="cb2">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
+        return '<div class="ci2'+(t.done?' done':'')+'" style="display:flex;align-items:center;gap:6px">'+
+          '<div onclick="toggleProjItem('+p.id+','+i+',false)" style="display:flex;align-items:center;gap:6px;flex:1;cursor:pointer">'+
+          '<div class="cb2">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>'+
+          '<button onclick="editProjItem('+p.id+','+i+',false)" style="background:none;border:none;cursor:pointer;color:var(--ink3);font-size:.8rem;padding:2px 4px;flex-shrink:0" title="Redigera">✎</button>'+
+          '<button onclick="delProjItem('+p.id+','+i+',false)" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:.8rem;padding:2px 4px;flex-shrink:0" title="Ta bort">✕</button>'+
+          '</div>';
       }).join('');
       var ihtml=p.items.map(function(t,i){
-        return '<div class="ci2'+(t.done?' done':'')+'" onclick="toggleProjItem('+p.id+','+i+',true)"><div class="cb2 sq">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>';
+        return '<div class="ci2'+(t.done?' done':'')+'" style="display:flex;align-items:center;gap:6px">'+
+          '<div onclick="toggleProjItem('+p.id+','+i+',true)" style="display:flex;align-items:center;gap:6px;flex:1;cursor:pointer">'+
+          '<div class="cb2 sq">'+(t.done?chk():'')+'</div><span>'+t.text+'</span></div>'+
+          '<button onclick="editProjItem('+p.id+','+i+',true)" style="background:none;border:none;cursor:pointer;color:var(--ink3);font-size:.8rem;padding:2px 4px;flex-shrink:0" title="Redigera">✎</button>'+
+          '<button onclick="delProjItem('+p.id+','+i+',true)" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:.8rem;padding:2px 4px;flex-shrink:0" title="Ta bort">✕</button>'+
+          '</div>';
       }).join('');
 
       var completedBanner = p.completed ? '<div style="background:#EAF3DE;padding:8px 16px;font-size:.8rem;color:#1A4D2E;display:flex;align-items:center;justify-content:space-between"><span>Klart '+p.completedDate+'</span><button class="btn" style="font-size:.75rem;padding:3px 10px" onclick="uncompleteProject('+p.id+')">Återaktivera</button></div>' : '';
@@ -1311,19 +1337,27 @@ function renderProjects(){
         '</div>'+
         '<div class="pc-btns">'+
         (!p.completed?'<button class="btn pri" style="font-size:.81rem" onclick="completeProject('+p.id+')">Markera som klar</button>':'')+ 
+        '<button class="btn ylw" style="font-size:.81rem" onclick="editProject('+p.id+')">Redigera projekt</button>'+
         '<button class="btn" style="font-size:.81rem" onclick="openGuide('+p.id+')">Hur gör man? →</button>'+
         '<button class="btn red" style="font-size:.81rem" onclick="delProject('+p.id+')">Ta bort</button>'+
         '</div>'+
         '</div></div>'+
         '<div class="pc-right">'+
         (p.todos.length?'<div class="cl-head" style="color:#1A4D2E">ATT GÖRA</div>'+thtml:'')+ 
+        (!p.completed?'<button onclick="addProjItem('+p.id+',false)" style="margin-top:5px;width:100%;padding:5px;background:none;border:1px dashed #b8ddc2;border-radius:5px;font-size:.78rem;color:#1A4D2E;cursor:pointer;font-family:inherit">+ Lägg till steg</button>':'')+
         (p.items.length?
           '<div class="cl-head" style="color:#854F0B;margin-top:'+(p.todos.length?'10px':'0')+'">INKÖP</div>'+
           ihtml+
-          (!p.completed?'<button onclick="copyItemsToMain('+p.id+')" style="margin-top:8px;width:100%;padding:6px;background:#FDF3E0;border:1px solid #e8c98a;border-radius:6px;font-size:.78rem;color:#854F0B;cursor:pointer;font-family:inherit">+ Flytta inköp till huvudlistan</button>':''):
+          (!p.completed?'<button onclick="addProjItem('+p.id+',true)" style="margin-top:5px;width:100%;padding:5px;background:none;border:1px dashed #e8c98a;border-radius:5px;font-size:.78rem;color:#854F0B;cursor:pointer;font-family:inherit">+ Lägg till inköp</button>':''):
           '')+
-        (!p.todos.length&&!p.items.length?'<div style="color:var(--ink3);font-size:.84rem">Inga punkter</div>':'')+
-        (p.todos.length&&!p.completed?'<button onclick="copyTodosToMain('+p.id+')" style="margin-top:8px;width:100%;padding:6px;background:#EAF3DE;border:1px solid #b8ddc2;border-radius:6px;font-size:.78rem;color:#1A4D2E;cursor:pointer;font-family:inherit">+ Flytta att göra till huvudlistan</button>':'')+
+        (!p.todos.length?(!p.completed?'<button onclick="addProjItem('+p.id+',false)" style="margin-top:5px;width:100%;padding:5px;background:none;border:1px dashed #b8ddc2;border-radius:5px;font-size:.78rem;color:#1A4D2E;cursor:pointer;font-family:inherit">+ Lägg till steg</button>':''):'')+ 
+        (!p.items.length?(!p.completed?'<button onclick="addProjItem('+p.id+',true)" style="margin-top:5px;width:100%;padding:5px;background:none;border:1px dashed #e8c98a;border-radius:5px;font-size:.78rem;color:#854F0B;cursor:pointer;font-family:inherit">+ Lägg till inköp</button>':''):'')+ 
+        (!p.todos.length&&!p.items.length?'<div style="color:var(--ink3);font-size:.84rem;margin-bottom:6px">Inga punkter</div>':'')+
+        (!p.completed?
+          '<div style="margin-top:8px;display:flex;gap:5px;flex-direction:column">'+
+          (p.todos.length?'<button onclick="copyTodosToMain('+p.id+')" style="width:100%;padding:5px;background:#EAF3DE;border:1px solid #b8ddc2;border-radius:5px;font-size:.76rem;color:#1A4D2E;cursor:pointer;font-family:inherit">→ Flytta att göra till huvudlistan</button>':'')+
+          (p.items.length?'<button onclick="copyItemsToMain('+p.id+')" style="width:100%;padding:5px;background:#FDF3E0;border:1px solid #e8c98a;border-radius:5px;font-size:.76rem;color:#854F0B;cursor:pointer;font-family:inherit">→ Flytta inköp till huvudlistan</button>':'')+
+          '</div>':'')+
         '</div></div>'+
         (p.guide?
           '<div style="border-top:1px solid var(--s)">'+
@@ -1354,7 +1388,74 @@ function toggleGuideExpand(id){
   if(arr)arr.textContent=open?'▲ Dölj':'▼ Visa';
 }
 
-function copyTodosToMain(pid){
+function editProjItem(pid, idx, isBuy){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var arr=isBuy?p.items:p.todos;
+  var current=arr[idx].text;
+  var newText=prompt((isBuy?'Redigera inköp:':'Redigera uppgift:'), current);
+  if(newText===null||!newText.trim())return;
+  arr[idx].text=newText.trim();
+  save('projects',projects);
+  renderProjects();
+}
+
+function delProjItem(pid, idx, isBuy){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var arr=isBuy?p.items:p.todos;
+  if(!confirm('Ta bort "'+arr[idx].text+'"?'))return;
+  arr.splice(idx,1);
+  var total=p.todos.length+p.items.length;
+  var done=p.todos.filter(function(t){return t.done;}).length+p.items.filter(function(t){return t.done;}).length;
+  p.progress=total?Math.round(done/total*100):0;
+  save('projects',projects);
+  renderProjects();
+}
+
+function addProjItem(pid, isBuy){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var newText=prompt(isBuy?'Lägg till inköp:':'Lägg till steg:','');
+  if(!newText||!newText.trim())return;
+  if(isBuy){p.items.push({text:newText.trim(),done:false});}
+  else{p.todos.push({text:newText.trim(),done:false});}
+  save('projects',projects);
+  renderProjects();
+}
+
+var editingProjectId=null;
+
+function editProject(pid){
+  var p=projects.find(function(x){return x.id===pid;});
+  if(!p)return;
+  editingProjectId=pid;
+  document.getElementById('proj-name').value=p.name;
+  document.getElementById('proj-cat').value=p.cat;
+  document.getElementById('proj-budget').value=p.budget||'';
+  document.getElementById('proj-desc').value=p.desc||'';
+  document.getElementById('proj-todos').value=p.todos.map(function(t){return t.text;}).join('\n');
+  document.getElementById('proj-items').value=p.items.map(function(t){return t.text;}).join('\n');
+  document.querySelector('#ov-proj .mh-t').textContent='Redigera projekt';
+  document.getElementById('btn-save-proj').textContent='Spara ändringar';
+  openModal('proj');
+}
+
+function closeModal(name){
+  var el=document.getElementById('ov-'+name);
+  if(el)el.classList.remove('on');
+  if(name==='proj'){
+    editingProjectId=null;
+    document.querySelector('#ov-proj .mh-t').textContent='Nytt projekt';
+    document.getElementById('btn-save-proj').textContent='Spara projekt';
+  }
+  if(name==='mission'){
+    editingMissionId=null;
+    document.querySelector('#ov-mission .mh-t').textContent='Nytt uppdrag';
+    document.getElementById('btn-save-mission').textContent='Spara uppdrag';
+  }
+}
+
   var p=projects.find(function(x){return x.id===pid;});
   if(!p)return;
   var added=0;
