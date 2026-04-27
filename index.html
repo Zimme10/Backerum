@@ -840,13 +840,14 @@ tr:hover td{background:#f9f9f6}
 
 <script>
 // ── GOOGLE DRIVE SYNC ─────────────────────────────
-var CLIENT_ID = '449663044867-7oaqsoplaf9rk134ivbks2hvm8lma3mr.apps.googleusercontent.com';
-var FOLDER_ID = '1F7iVW8UsTIeC9knrzGmhj_R7KdHFX_sN';
-var SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
-var FILE_NAME = 'backerum-data.json';
-var driveFileId = null;
-var tokenClient = null;
-var isSignedIn = false;
+var CLIENT_ID='449663044867-7oaqsoplaf9rk134ivbks2hvm8lma3mr.apps.googleusercontent.com';
+var FOLDER_ID='1F7iVW8UsTIeC9knrzGmhj_R7KdHFX_sN';
+var SCOPE='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
+var FILE_NAME='backerum-data.json';
+var driveFileId=null;
+var tokenClient=null;
+var isSignedIn=false;
+var googleReady=false;
 
 // ── LOCAL FALLBACK ────────────────────────────────
 function load(k,d){try{var v=localStorage.getItem('br_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
@@ -908,7 +909,8 @@ function applyData(d){
 }
 
 // ── DRIVE API CALLS ───────────────────────────────
-function getToken(){return gapi.client.getToken()&&gapi.client.getToken().access_token;}
+var accessToken=null;
+function getToken(){return accessToken;}
 
 function syncToDrive(){
   if(!isSignedIn||!getToken())return;
@@ -990,43 +992,51 @@ function setStatus(msg){
 
 // ── GOOGLE IDENTITY ───────────────────────────────
 function initGoogleAuth(){
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID,
-    scope:SCOPE,
-    callback:function(resp){
-      if(resp.error){showSyncStatus('Inloggning misslyckades','err');return;}
-      isSignedIn=true;
-      updateSignInUI(true);
-      loadFromDrive();
-    }
-  });
-  // Försök stilla-inloggning om vi har ett sparat token-hint
-  gapi.load('client',function(){
-    gapi.client.init({}).then(function(){
-      // Kolla om det finns en sparad session
-      var hint=localStorage.getItem('br_gaccount');
-      if(hint){
-        tokenClient.requestAccessToken({prompt:'none',login_hint:hint});
+  try {
+    tokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:CLIENT_ID,
+      scope:SCOPE,
+      callback:function(resp){
+        if(resp.error){
+          showSyncStatus('Inloggning misslyckades: '+resp.error,'err');
+          return;
+        }
+        accessToken=resp.access_token;
+        isSignedIn=true;
+        updateSignInUI(true);
+        loadFromDrive();
       }
     });
-  });
+    googleReady=true;
+    var btn=document.getElementById('btn-signin');
+    if(btn) btn.textContent='Logga in med Google';
+    showSyncStatus('Google redo');
+    setTimeout(function(){showSyncStatus('');},2000);
+  } catch(e) {
+    showSyncStatus('Google-fel: '+e.message,'err');
+  }
 }
 
 function signIn(){
-  if(!tokenClient){
-    showSyncStatus('Laddar Google – försök igen om ett ögonblick...','err');
-    setTimeout(function(){
-      if(tokenClient) tokenClient.requestAccessToken({prompt:''});
-    },2000);
+  if(!googleReady||!tokenClient){
+    var msg='Google laddar fortfarande – vänta några sekunder och försök igen.';
+    showSyncStatus(msg,'err');
+    alert(msg);
     return;
   }
-  tokenClient.requestAccessToken({prompt:''});
+  try {
+    tokenClient.requestAccessToken({prompt:'consent'});
+  } catch(e) {
+    showSyncStatus('Fel: '+e.message,'err');
+    alert('Inloggningsfel: '+e.message);
+  }
 }
 
 function signOut(){
-  var token=gapi.client.getToken();
-  if(token){google.accounts.oauth2.revoke(token.access_token);}
-  gapi.client.setToken('');
+  if(accessToken){
+    try{google.accounts.oauth2.revoke(accessToken);}catch(e){}
+  }
+  accessToken=null;
   isSignedIn=false;
   updateSignInUI(false);
   showSyncStatus('Utloggad');
@@ -1533,6 +1543,7 @@ function closeModal(name){
   }
 }
 
+function copyTodosToMain(pid){
   var p=projects.find(function(x){return x.id===pid;});
   if(!p)return;
   var added=0;
@@ -2622,27 +2633,24 @@ fetchWeather();
 
 // Ladda Google-bibliotek
 var signinBtn=document.getElementById('btn-signin');
-if(signinBtn) signinBtn.textContent='Laddar...';
+if(signinBtn) signinBtn.textContent='Laddar Google...';
 
-var gapiScript=document.createElement('script');
-gapiScript.src='https://apis.google.com/js/api.js';
-gapiScript.onload=function(){
+function loadGoogleLibs(){
   var gisScript=document.createElement('script');
   gisScript.src='https://accounts.google.com/gsi/client';
   gisScript.onload=function(){
+    // GIS laddat – nu initialisera
     initGoogleAuth();
-    if(signinBtn) signinBtn.textContent='Logga in med Google';
   };
   gisScript.onerror=function(){
+    showSyncStatus('Kunde inte ladda Google Sign-In','err');
     if(signinBtn) signinBtn.textContent='Logga in med Google';
-    showSyncStatus('Kunde inte ladda Google – kontrollera internet','err');
   };
   document.head.appendChild(gisScript);
-};
-gapiScript.onerror=function(){
-  if(signinBtn) signinBtn.textContent='Logga in med Google';
-};
-document.head.appendChild(gapiScript);
+}
+
+// Starta laddningen
+loadGoogleLibs();
 </script>
 </body>
 </html>
