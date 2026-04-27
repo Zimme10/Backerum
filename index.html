@@ -1013,6 +1013,13 @@ function initGoogleAuth(){
 }
 
 function signIn(){
+  if(!tokenClient){
+    showSyncStatus('Laddar Google – försök igen om ett ögonblick...','err');
+    setTimeout(function(){
+      if(tokenClient) tokenClient.requestAccessToken({prompt:''});
+    },2000);
+    return;
+  }
   tokenClient.requestAccessToken({prompt:''});
 }
 
@@ -2614,6 +2621,9 @@ renderAll();
 fetchWeather();
 
 // Ladda Google-bibliotek
+var signinBtn=document.getElementById('btn-signin');
+if(signinBtn) signinBtn.textContent='Laddar...';
+
 var gapiScript=document.createElement('script');
 gapiScript.src='https://apis.google.com/js/api.js';
 gapiScript.onload=function(){
@@ -2621,8 +2631,16 @@ gapiScript.onload=function(){
   gisScript.src='https://accounts.google.com/gsi/client';
   gisScript.onload=function(){
     initGoogleAuth();
+    if(signinBtn) signinBtn.textContent='Logga in med Google';
+  };
+  gisScript.onerror=function(){
+    if(signinBtn) signinBtn.textContent='Logga in med Google';
+    showSyncStatus('Kunde inte ladda Google – kontrollera internet','err');
   };
   document.head.appendChild(gisScript);
+};
+gapiScript.onerror=function(){
+  if(signinBtn) signinBtn.textContent='Logga in med Google';
 };
 document.head.appendChild(gapiScript);
 </script>
