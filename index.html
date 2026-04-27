@@ -483,7 +483,7 @@ tr:hover td{background:#f9f9f6}
 
   <div class="card">
     <div class="ch"><div class="ct">Gästregister</div></div>
-    <div style="padding:0"><table><thead><tr><th>Gäst</th><th>Incheckning</th><th>Utcheckning</th><th>Plattform</th><th>Belopp</th><th>Kontakt</th></tr></thead><tbody id="guest-body"></tbody></table></div>
+    <div style="padding:0"><table><thead><tr><th>Gäst</th><th>Incheckning</th><th>Utcheckning</th><th>Plattform</th><th>Belopp</th><th>Kontakt</th><th>Mail</th></tr></thead><tbody id="guest-body"></tbody></table></div>
   </div>
 </div>
 
@@ -1188,8 +1188,21 @@ document.getElementById('btn-save-guest').addEventListener('click',function(){
 function renderGuests(){
   var tb=document.getElementById('guest-body');
   var pc={Airbnb:'br',Stugknuten:'bg',Stugnet:'bb',Direkt:'bs'};
-  if(!guests.length){tb.innerHTML='<tr><td colspan="6" class="empty-td">Inga gästbokningar ännu</td></tr>';updateKPIs();return;}
-  tb.innerHTML=guests.map(function(g){return '<tr><td style="font-weight:500">'+g.name+'</td><td>'+(g.in||'–')+'</td><td>'+(g.out||'–')+'</td><td><span class="badge '+(pc[g.platform]||'bs')+'">'+g.platform+'</span></td><td>'+(g.amount?g.amount.toLocaleString('sv')+' kr':'–')+'</td><td style="font-size:.82rem;color:var(--ink3)">'+(g.contact||'–')+'</td></tr>';}).join('');
+  if(!guests.length){tb.innerHTML='<tr><td colspan="7" class="empty-td">Inga gästbokningar ännu</td></tr>';updateKPIs();return;}
+  tb.innerHTML=guests.map(function(g,i){
+    return '<tr>'+
+      '<td style="font-weight:500">'+g.name+'</td>'+
+      '<td>'+(g.in||'–')+'</td>'+
+      '<td>'+(g.out||'–')+'</td>'+
+      '<td><span class="badge '+(pc[g.platform]||'bs')+'">'+g.platform+'</span></td>'+
+      '<td>'+(g.amount?g.amount.toLocaleString('sv')+' kr':'–')+'</td>'+
+      '<td style="font-size:.82rem;color:var(--ink3)">'+(g.contact||'–')+'</td>'+
+      '<td style="white-space:nowrap">'+
+        '<button class="btn" style="font-size:.72rem;padding:3px 8px;margin-right:3px" onclick="sendWelcomeMail('+i+')">📧 Välkommen</button>'+
+        '<button class="btn" style="font-size:.72rem;padding:3px 8px" onclick="sendReviewMail('+i+')">⭐ Utvärdering</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
   document.getElementById('guestcount').textContent=guests.length;
   var tot=guests.reduce(function(s,g){return s+g.amount;},0);
   document.getElementById('income').textContent=tot.toLocaleString('sv')+' kr';
@@ -1198,6 +1211,63 @@ function renderGuests(){
   document.getElementById('nights').textContent=Math.round(nights);
   updateKPIs();
 }
+
+function sendWelcomeMail(idx){
+  var g=guests[idx];
+  var subject='Välkommen till Backerum, '+g.name+'!';
+  var body='Hej '+g.name+'!\n\n'+
+    'Vi ser så mycket fram emot att välkomna dig till Backerum i Sankt Anna.\n\n'+
+    '📅 INCHECKNING: '+( g.in||'–')+'\n'+
+    '📅 UTCHECKNING: '+(g.out||'–')+'\n\n'+
+    '🏡 OM STUGAN\n'+
+    'Stugan ligger vackert vid havet i Sankt Anna skärgård. Här hittar du lugn och ro, '+
+    'natur och vatten i en av Sveriges vackraste skärgårdar.\n\n'+
+    '🔑 NYCKEL & INCHECKNING\n'+
+    'Nyckeln hittar du [beskriv var nyckeln finns]. Koden till [port/lås] är [kod].\n\n'+
+    '📋 HUSREGLER\n'+
+    '• Rökning sker utomhus\n'+
+    '• Husdjur är välkomna men hålls borta från möbler\n'+
+    '• Städning ingår ej – lämna stugan i det skick ni önskade hitta den\n'+
+    '• Sopor sorteras och slängs i [beskriv var]\n'+
+    '• Sista utcheckning kl 11:00\n\n'+
+    '📞 KONTAKT\n'+
+    'Om något är oklart eller om det uppstår problem – kontakta oss på backerum1@gmail.com\n\n'+
+    '🌊 VI HOPPAS ATT NI FÅR EN FANTASTISK VISTELSE!\n\n'+
+    'Varma hälsningar\n'+
+    'Familjen Winterås Hansson';
+  window.location.href='mailto:'+(g.contact||'')+
+    '?subject='+encodeURIComponent(subject)+
+    '&body='+encodeURIComponent(body);
+}
+
+function sendReviewMail(idx){
+  var g=guests[idx];
+  var subject='Tack för ditt besök på Backerum – dela dina tankar!';
+  var body='Hej '+g.name+'!\n\n'+
+    'Tack för att du/ni valde att tillbringa tid på Backerum '+
+    (g.in&&g.out?'('+g.in+' – '+g.out+')':'')+'. '+
+    'Vi hoppas att ni hade en härlig vistelse!\n\n'+
+    'Vi skulle uppskatta om du tog ett par minuter och svarade på dessa frågor:\n\n'+
+    '⭐ BETYG (1–5)\n'+
+    'Helhetsupplevelse: ___\n'+
+    'Stugans skick: ___\n'+
+    'Läge och natur: ___\n'+
+    'Värdet för pengarna: ___\n\n'+
+    '💬 FEEDBACK\n'+
+    'Vad uppskattade ni mest?\n\n\n'+
+    'Vad kan vi förbättra?\n\n\n'+
+    'Skulle ni rekommendera Backerum till andra? (Ja/Nej)\n\n'+
+    'Är ni intresserade av att boka igen? (Ja/Nej/Kanske)\n\n'+
+    'Svara gärna direkt på detta mail – vi läser allt och tar era synpunkter på allvar!\n\n'+
+    'Tack igen och välkommen tillbaka!\n\n'+
+    'Varma hälsningar\n'+
+    'Familjen Winterås Hansson\n'+
+    'backerum1@gmail.com';
+  window.location.href='mailto:'+(g.contact||'')+
+    '?subject='+encodeURIComponent(subject)+
+    '&body='+encodeURIComponent(body);
+}
+
 
 // ── PROJECTS ──────────────────────────────────────
 document.getElementById('btn-save-proj').addEventListener('click',function(){
