@@ -144,7 +144,9 @@ main{padding:16px;max-width:680px;margin:0 auto}
 
 <script>
 var FORMSPREE='https://formspree.io/f/mrerwzng';
-var TOKEN=new URLSearchParams(window.location.search).get('id')||'';
+var params=new URLSearchParams(window.location.search);
+var TOKEN=params.get('id')||'';
+var URL_DATA=params.get('d')||'';
 var MY_NAME='';
 var SD=null;
 var WMO={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',61:'🌧️',71:'❄️',80:'🌦️',95:'⛈️'};
@@ -155,31 +157,66 @@ if(!TOKEN){document.getElementById('name-screen').innerHTML='<div class="name-ca
 
 function loadSD(){try{var r=localStorage.getItem('br_share_'+TOKEN);return r?JSON.parse(r):null;}catch(e){return null;}}
 function saveSD(){try{localStorage.setItem('br_share_'+TOKEN,JSON.stringify(SD));}catch(e){}}
-function findMission(){try{return(JSON.parse(localStorage.getItem('br_missions')||'[]')).find(function(m){return m.shareToken===TOKEN;});}catch(e){return null;}}
-function findProjects(ids){try{return(JSON.parse(localStorage.getItem('br_projects')||'[]')).filter(function(p){return ids.includes(p.id);});}catch(e){return[];}}
+
+function loadFromUrl(){
+  if(!URL_DATA) return null;
+  try{
+    return JSON.parse(decodeURIComponent(escape(atob(URL_DATA))));
+  }catch(e){
+    try{return JSON.parse(atob(URL_DATA));}catch(e2){return null;}
+  }
+}
 
 function joinMission(){
   var name=document.getElementById('participant-name').value.trim();
   if(!name){alert('Ange ditt namn');return;}
   MY_NAME=name;
-  SD=loadSD();
-  if(!SD){
-    var m=findMission();
-    if(!m){document.getElementById('name-screen').innerHTML='<div class="name-card"><div style="font-size:1.1rem;font-weight:500;margin-bottom:8px">Hoppsan</div><div style="color:var(--ink3)">Uppdraget hittades inte. Öppna länken igen från mailet.</div></div>';return;}
-    var ps=findProjects(m.projectIds||[]);
-    SD={token:TOKEN,missionId:m.id,name:m.name,date:m.date||'',people:m.people||'',
-      projects:ps.map(function(p){return{id:p.id,name:p.name,cat:p.cat,desc:p.desc,
-        todos:p.todos.map(function(t){return{text:t.text,done:t.done,doneBy:'',doneAt:''};},),
-        items:p.items.map(function(t){return{text:t.text,done:t.done,doneBy:'',doneAt:''};})
-      };}),
-      extras:(m.extras||[]).map(function(e){return{text:e.text,done:e.done,doneBy:'',doneAt:''};},),
-      participants:[],comments:[]};
+
+  // 1. Försök från URL-data (alltid färskt från värden)
+  var urlData=loadFromUrl();
+  if(urlData && urlData.name){
+    // Slå ihop med eventuell lokal data (för att behålla avbockningar)
+    var local=loadSD();
+    if(local && local.token===TOKEN){
+      // Uppdatera projekt från URL men behåll lokala avbockningar
+      urlData.participants=local.participants||[];
+      urlData.comments=local.comments||[];
+      urlData.projects=urlData.projects.map(function(up){
+        var lp=local.projects&&local.projects.find(function(x){return x.id===up.id;});
+        if(lp){
+          up.todos=up.todos.map(function(t,i){return lp.todos[i]?{text:t.text,done:lp.todos[i].done,doneBy:lp.todos[i].doneBy||''}:{text:t.text,done:t.done,doneBy:''};});
+          up.items=up.items.map(function(t,i){return lp.items[i]?{text:t.text,done:lp.items[i].done,doneBy:lp.items[i].doneBy||''}:{text:t.text,done:t.done,doneBy:''};});
+        }
+        return up;
+      });
+    }
+    SD=urlData;
     saveSD();
+    finishJoin(name);
+    return;
   }
+
+  // 2. Fallback till localStorage
+  SD=loadSD();
+  if(SD && SD.name){
+    finishJoin(name);
+    return;
+  }
+
+  // 3. Ingenting hittades
+  document.getElementById('name-screen').innerHTML='<div class="name-card">'+
+    '<div style="font-size:1.1rem;font-weight:500;margin-bottom:8px">Hoppsan</div>'+
+    '<div style="color:var(--ink3);line-height:1.6">Uppdraget hittades inte.<br><br>'+
+    'Be värden gå in i appen, öppna uppdraget och klicka <strong>"Dela med deltagare"</strong> igen – '+
+    'då genereras en ny länk som fungerar!</div></div>';
+}
+
+function finishJoin(name){
+  if(!SD.participants) SD.participants=[];
+  if(!SD.comments) SD.comments=[];
   if(!SD.participants.find(function(p){return p.name.toLowerCase()===name.toLowerCase();})){
     SD.participants.push({name:name,joined:new Date().toLocaleDateString('sv-SE')});
     saveSD();
-    try{var ms=JSON.parse(localStorage.getItem('br_missions')||'[]');var m2=ms.find(function(x){return x.shareToken===TOKEN;});if(m2){if(!m2.participants)m2.participants=[];if(!m2.participants.find(function(p){return p.name.toLowerCase()===name.toLowerCase();}))m2.participants.push({name:name,joined:new Date().toLocaleDateString('sv-SE')});localStorage.setItem('br_missions',JSON.stringify(ms));}}catch(e){}
   }
   document.getElementById('form-name').value=name;
   document.getElementById('form-mission').value=SD.name;
