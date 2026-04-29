@@ -303,8 +303,9 @@ function fetchWeather(){
 }
 
 window.addEventListener('load',function(){
-  var d=loadSD();var m=findMission();
-  var name=(d&&d.name)||(m&&m.name)||'';
+  var urlData=loadFromUrl();
+  var localData=loadSD();
+  var name=(urlData&&urlData.name)||(localData&&localData.name)||'';
   if(name)document.getElementById('name-sub').textContent='Du är inbjuden till "'+name+'". Skriv ditt namn för att fortsätta.';
   document.getElementById('participant-name').focus();
   document.getElementById('participant-name').addEventListener('keydown',function(e){if(e.key==='Enter')joinMission();});
