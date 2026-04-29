@@ -2567,12 +2567,12 @@ function shareMissionLink(mid) {
     comments: []
   };
 
-  // Koda data som base64 och lägg i URL
+  // Koda data – mobilkompatibel base64
   var encoded;
   try {
-    encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
+    encoded = btoa(encodeURIComponent(JSON.stringify(shareData)).replace(/%([0-9A-F]{2})/g,function(m,p){return String.fromCharCode('0x'+p);}));
   } catch(e) {
-    encoded = btoa(JSON.stringify(shareData));
+    encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
   }
 
   var shareUrl = baseUrl + 'uppdrag.html?id=' + m.shareToken + '&d=' + encoded;
