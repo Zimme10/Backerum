@@ -161,19 +161,19 @@ function saveSD(){try{localStorage.setItem('br_share_'+TOKEN,JSON.stringify(SD))
 function loadFromUrl(){
   if(!URL_DATA) return null;
   try{
-    // Hantera URL-safe base64 (- och _ istället för + och /)
-    var base64 = URL_DATA.replace(/-/g,'+').replace(/_/g,'/');
-    while(base64.length % 4) base64 += '=';
-    var jsonStr = decodeURIComponent(escape(atob(base64)));
+    var base64=URL_DATA.replace(/-/g,'+').replace(/_/g,'/');
+    while(base64.length%4) base64+='=';
+    var binary=atob(base64);
+    var bytes=new Uint8Array(binary.length);
+    for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    var jsonStr=new TextDecoder('utf-8').decode(bytes);
     return JSON.parse(jsonStr);
   }catch(e){
     try{
-      // Fallback – prova direkt
-      return JSON.parse(decodeURIComponent(escape(atob(URL_DATA))));
-    }catch(e2){
-      try{return JSON.parse(atob(URL_DATA));}
-      catch(e3){return null;}
-    }
+      var b2=URL_DATA.replace(/-/g,'+').replace(/_/g,'/');
+      while(b2.length%4) b2+='=';
+      return JSON.parse(atob(b2));
+    }catch(e2){return null;}
   }
 }
 
