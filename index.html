@@ -2541,27 +2541,126 @@ function shareMissionLink(mid) {
   var m = missions.find(function(x){return x.id===mid;});
   if(!m) return;
 
-  // Generera en delnings-token om den inte finns
   if(!m.shareToken) {
     m.shareToken = Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);
     save('missions', missions);
   }
 
   var baseUrl = window.location.href.split('?')[0].replace(/\/[^\/]*$/, '/');
-  var shareUrl = baseUrl + 'uppdrag.html?id=' + m.shareToken;
-
   var mps = projects.filter(function(p){return m.projectIds.includes(p.id);});
+
+  // Bygg kompakt uppdragsdata
+  var shareData = {
+    token: m.shareToken,
+    name: m.name,
+    date: m.date||'',
+    people: m.people||'',
+    projects: mps.map(function(p){
+      return {
+        id: p.id, name: p.name, desc: p.desc||'',
+        todos: p.todos.map(function(t){return{text:t.text,done:t.done};}),
+        items: p.items.map(function(t){return{text:t.text,done:t.done};})
+      };
+    }),
+    extras: (m.extras||[]).map(function(e){return{text:e.text,done:e.done};}),
+    participants: [],
+    comments: []
+  };
+
+  // Koda data som base64 och lägg i URL
+  var encoded;
+  try {
+    encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
+  } catch(e) {
+    encoded = btoa(JSON.stringify(shareData));
+  }
+
+  var shareUrl = baseUrl + 'uppdrag.html?id=' + m.shareToken + '&d=' + encoded;
+
+  // Spara även i Drive om inloggad (bonus)
+  if(isSignedIn && getToken()) {
+    saveMissionToDrive(shareData, m.shareToken);
+  }
+
   var mailBody = 'Hej!\n\nDu är inbjuden att delta i uppdraget "' + m.name + '"' +
     (m.date ? ' – ' + m.date : '') + '.\n\n' +
     (mps.length ? 'Projekt att göra:\n' + mps.map(function(p){return '• '+p.name;}).join('\n') + '\n\n' : '') +
-    'Öppna länken nedan för att se detaljer, bocka av uppgifter och lägga till kommentarer:\n\n' +
+    'Öppna länken nedan för att se detaljer, bocka av uppgifter och ladda upp bilder:\n\n' +
     shareUrl + '\n\n' +
+    'Ingen inloggning krävs – öppna bara länken! 🏡\n\n' +
     'Hälsningar från Backerum!';
 
   var mailSubject = 'Uppdrag: ' + m.name + (m.date ? ' – ' + m.date : '');
-
-  // Visa modal med länk och mailalternativ
   showShareModal(m, shareUrl, mailSubject, mailBody);
+}
+
+function saveMissionToDrive(data, token) {
+  var fileName = 'uppdrag-' + token + '.json';
+  var content = JSON.stringify(data);
+
+  // Sök efter befintlig fil
+  var q = 'name="'+fileName+'" and "'+FOLDER_ID+'" in parents and trashed=false';
+  fetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id)',{
+    headers:{'Authorization':'Bearer '+getToken()}
+  }).then(function(r){return r.json();})
+  .then(function(res){
+    if(res.files && res.files.length > 0) {
+      // Uppdatera befintlig
+      return fetch('https://www.googleapis.com/upload/drive/v3/files/'+res.files[0].id+'?uploadType=media',{
+        method:'PATCH',
+        headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+        body:content
+      });
+    } else {
+      // Skapa ny
+      return fetch('https://www.googleapis.com/drive/v3/files',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+        body:JSON.stringify({name:fileName,parents:[FOLDER_ID],mimeType:'application/json'})
+      }).then(function(r){return r.json();})
+      .then(function(f){
+        // Gör filen publik
+        fetch('https://www.googleapis.com/drive/v3/files/'+f.id+'/permissions',{
+          method:'POST',
+          headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+          body:JSON.stringify({role:'reader',type:'anyone'})
+        });
+        // Ladda upp innehåll
+        return fetch('https://www.googleapis.com/upload/drive/v3/files/'+f.id+'?uploadType=media',{
+          method:'PATCH',
+          headers:{'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'},
+          body:content
+        });
+      });
+    }
+  }).then(function(){
+    showSyncStatus('Uppdrag sparat i Drive – redo att dela!');
+  }).catch(function(){
+    showSyncStatus('Kunde inte spara i Drive','err');
+  });
+}
+
+function loadMissionFromDrive(token, callback) {
+  // Sök filen i Drive
+  var q = 'name="uppdrag-'+token+'.json" and trashed=false';
+  fetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id)&corpus=allDrives&includeItemsFromAllDrives=true&supportsAllDrives=true',{
+    headers:{'Authorization':'Bearer '+getToken()}
+  }).then(function(r){return r.json();})
+  .then(function(res){
+    if(res.files && res.files.length > 0) {
+      return fetch('https://www.googleapis.com/drive/v3/files/'+res.files[0].id+'?alt=media',{
+        headers:{'Authorization':'Bearer '+getToken()}
+      }).then(function(r){return r.json();});
+    }
+    return null;
+  }).then(function(data){
+    if(data) callback(data);
+  }).catch(function(){});
+}
+
+function syncMissionToDrive(token, data) {
+  if(!isSignedIn || !getToken()) return;
+  saveMissionToDrive(data, token);
 }
 
 function showShareModal(m, url, subject, body) {
