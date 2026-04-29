@@ -161,15 +161,19 @@ function saveSD(){try{localStorage.setItem('br_share_'+TOKEN,JSON.stringify(SD))
 function loadFromUrl(){
   if(!URL_DATA) return null;
   try{
-    // Fungerar på alla webbläsare inklusive Safari på iPhone
+    // Hantera URL-safe base64 (- och _ istället för + och /)
     var base64 = URL_DATA.replace(/-/g,'+').replace(/_/g,'/');
     while(base64.length % 4) base64 += '=';
-    var decoded = decodeURIComponent(Array.prototype.map.call(atob(base64),function(c){
-      return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(decoded);
+    var jsonStr = decodeURIComponent(escape(atob(base64)));
+    return JSON.parse(jsonStr);
   }catch(e){
-    try{return JSON.parse(atob(URL_DATA));}catch(e2){return null;}
+    try{
+      // Fallback – prova direkt
+      return JSON.parse(decodeURIComponent(escape(atob(URL_DATA))));
+    }catch(e2){
+      try{return JSON.parse(atob(URL_DATA));}
+      catch(e3){return null;}
+    }
   }
 }
 
