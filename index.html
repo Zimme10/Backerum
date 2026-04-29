@@ -2567,13 +2567,12 @@ function shareMissionLink(mid) {
     comments: []
   };
 
-  // Koda data – mobilkompatibel base64
-  var encoded;
-  try {
-    encoded = btoa(encodeURIComponent(JSON.stringify(shareData)).replace(/%([0-9A-F]{2})/g,function(m,p){return String.fromCharCode('0x'+p);}));
-  } catch(e) {
-    encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
-  }
+  // Koda data – URL-safe base64 som fungerar i Safari
+  var jsonStr = JSON.stringify(shareData);
+  var encoded = btoa(unescape(encodeURIComponent(jsonStr)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
 
   var shareUrl = baseUrl + 'uppdrag.html?id=' + m.shareToken + '&d=' + encoded;
 
