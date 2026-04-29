@@ -182,43 +182,46 @@ function joinMission(){
   if(!name){alert('Ange ditt namn');return;}
   MY_NAME=name;
 
-  // 1. Försök från URL-data (alltid färskt från värden)
-  var urlData=loadFromUrl();
-  if(urlData && urlData.name){
-    // Slå ihop med eventuell lokal data (för att behålla avbockningar)
-    var local=loadSD();
-    if(local && local.token===TOKEN){
-      // Uppdatera projekt från URL men behåll lokala avbockningar
-      urlData.participants=local.participants||[];
-      urlData.comments=local.comments||[];
-      urlData.projects=urlData.projects.map(function(up){
-        var lp=local.projects&&local.projects.find(function(x){return x.id===up.id;});
-        if(lp){
-          up.todos=up.todos.map(function(t,i){return lp.todos[i]?{text:t.text,done:lp.todos[i].done,doneBy:lp.todos[i].doneBy||''}:{text:t.text,done:t.done,doneBy:''};});
-          up.items=up.items.map(function(t,i){return lp.items[i]?{text:t.text,done:lp.items[i].done,doneBy:lp.items[i].doneBy||''}:{text:t.text,done:t.done,doneBy:''};});
+  var btn=document.querySelector('#name-screen button');
+  if(btn){btn.textContent='Öppnar...';btn.disabled=true;}
+
+  setTimeout(function(){
+    try{
+      // 1. Försök från URL-data
+      var urlData=loadFromUrl();
+      if(urlData && urlData.name){
+        var local=loadSD();
+        if(local && local.token===TOKEN){
+          urlData.participants=local.participants||[];
+          urlData.comments=local.comments||[];
+          urlData.projects=urlData.projects.map(function(up){
+            var lp=local.projects&&local.projects.find(function(x){return x.id===up.id;});
+            if(lp){
+              up.todos=up.todos.map(function(t,i){return lp.todos[i]?{text:t.text,done:lp.todos[i].done,doneBy:lp.todos[i].doneBy||''}:{text:t.text,done:t.done,doneBy:''};});
+              up.items=up.items.map(function(t,i){return lp.items[i]?{text:t.text,done:lp.items[i].done,doneBy:lp.items[i].doneBy||''}:{text:t.text,done:t.done,doneBy:''};});
+            }
+            return up;
+          });
         }
-        return up;
-      });
+        SD=urlData;
+        saveSD();
+        finishJoin(name);
+        return;
+      }
+      // 2. Fallback till localStorage
+      SD=loadSD();
+      if(SD && SD.name){finishJoin(name);return;}
+      // 3. Ingenting hittades
+      document.getElementById('name-screen').innerHTML='<div class="name-card">'+
+        '<div style="font-size:1.1rem;font-weight:500;margin-bottom:8px">Hoppsan</div>'+
+        '<div style="color:var(--ink3);line-height:1.6">Uppdraget hittades inte.<br><br>'+
+        'Be värden skicka länken igen!</div></div>';
+    }catch(e){
+      document.getElementById('name-screen').innerHTML='<div class="name-card">'+
+        '<div style="font-size:1.1rem;font-weight:500;margin-bottom:8px">Något gick fel</div>'+
+        '<div style="color:var(--ink3);line-height:1.6">'+e.message+'<br><br>Prova att ladda om sidan.</div></div>';
     }
-    SD=urlData;
-    saveSD();
-    finishJoin(name);
-    return;
-  }
-
-  // 2. Fallback till localStorage
-  SD=loadSD();
-  if(SD && SD.name){
-    finishJoin(name);
-    return;
-  }
-
-  // 3. Ingenting hittades
-  document.getElementById('name-screen').innerHTML='<div class="name-card">'+
-    '<div style="font-size:1.1rem;font-weight:500;margin-bottom:8px">Hoppsan</div>'+
-    '<div style="color:var(--ink3);line-height:1.6">Uppdraget hittades inte.<br><br>'+
-    'Be värden gå in i appen, öppna uppdraget och klicka <strong>"Dela med deltagare"</strong> igen – '+
-    'då genereras en ny länk som fungerar!</div></div>';
+  },200);
 }
 
 function finishJoin(name){
